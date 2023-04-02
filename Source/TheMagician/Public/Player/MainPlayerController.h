@@ -8,6 +8,7 @@
 
 class UInputMappingContext;
 class UInputAction;
+class IEnemyInterface;
 struct FInputActionValue;
 
 /**
@@ -20,6 +21,7 @@ class THEMAGICIAN_API AMainPlayerController : public APlayerController
 
 public:
 	AMainPlayerController();
+	virtual void PlayerTick(float DeltaTime) override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -35,5 +37,10 @@ private:
 
 	/* Callbacks for Input */
 	void Move(const FInputActionValue& InputActionValue);
+
+	void CursorTrace();
+
+	TObjectPtr<IEnemyInterface> LastHoveredActor;
+	TObjectPtr<IEnemyInterface> CurrentHoveredActor;
 	
 };
