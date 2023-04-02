@@ -28,6 +28,9 @@ protected:
 	virtual void SetupInputComponent() override;
 
 private:
+	UPROPERTY(EditAnywhere, Category = Camera)
+	float CameraZoomRate = 40.f;
+	
 	/* Enhanced Input */
 	UPROPERTY(EditAnywhere, Category = Input)
 	TObjectPtr<UInputMappingContext> InputContext;
@@ -35,8 +38,12 @@ private:
 	UPROPERTY(EditAnywhere, Category = Input)
 	TObjectPtr<UInputAction> MoveAction;
 
+	UPROPERTY(EditAnywhere, Category = Input)
+	TObjectPtr<UInputAction> MoveCameraAction;
+
 	/* Callbacks for Input */
 	void Move(const FInputActionValue& InputActionValue);
+	void MoveCamera(const FInputActionValue& InputActionValue);
 
 	void CursorTrace();
 

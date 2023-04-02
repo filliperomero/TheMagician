@@ -5,6 +5,8 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Character/MainCharacter.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "Interaction/EnemyInterface.h"
 
 AMainPlayerController::AMainPlayerController()
@@ -47,6 +49,7 @@ void AMainPlayerController::SetupInputComponent()
 	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
 	
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ThisClass::Move);
+	EnhancedInputComponent->BindAction(MoveCameraAction, ETriggerEvent::Triggered, this, &ThisClass::MoveCamera);
 }
 
 void AMainPlayerController::Move(const FInputActionValue& InputActionValue)
@@ -62,6 +65,22 @@ void AMainPlayerController::Move(const FInputActionValue& InputActionValue)
 	{
 		ControlledPawn->AddMovementInput(ForwardDirection, InputAxisVector.Y);
 		ControlledPawn->AddMovementInput(RightDirection, InputAxisVector.X);
+	}
+}
+
+void AMainPlayerController::MoveCamera(const FInputActionValue& InputActionValue)
+{
+	const float Value = InputActionValue.Get<float>();
+
+	if (AMainCharacter* MainCharacter = GetPawn<AMainCharacter>())
+	{
+		if (MainCharacter->GetCameraBoom())
+		{
+			const float CurrentCameraValue = MainCharacter->GetCameraBoom()->TargetArmLength;
+			const float NewTargetValue = FMath::Clamp(CurrentCameraValue + CameraZoomRate * Value, MainCharacter->GetMinCameraBoomDistance(), MainCharacter->GetMaxCameraBoomDistance());
+
+			MainCharacter->GetCameraBoom()->TargetArmLength = NewTargetValue;
+		}
 	}
 }
 

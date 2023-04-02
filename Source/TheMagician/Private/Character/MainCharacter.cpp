@@ -20,7 +20,7 @@ AMainCharacter::AMainCharacter()
 	
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>("Camera Boom");
 	CameraBoom->SetupAttachment(GetRootComponent());
-	CameraBoom->TargetArmLength = 750.f;
+	CameraBoom->TargetArmLength = MaxCameraBoomDistance;
 	CameraBoom->SetRelativeRotation(FRotator(-45.f, 0.f, 0.f));
 	CameraBoom->bUsePawnControlRotation = false;
 	CameraBoom->bEnableCameraLag = true;
