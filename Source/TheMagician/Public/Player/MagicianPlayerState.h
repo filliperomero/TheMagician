@@ -4,17 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerState.h"
-#include "MainPlayerState.generated.h"
+#include "MagicianPlayerState.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class THEMAGICIAN_API AMainPlayerState : public APlayerState
+class THEMAGICIAN_API AMagicianPlayerState : public APlayerState
 {
 	GENERATED_BODY()
 
 public:
-	AMainPlayerState();
+	AMagicianPlayerState();
 	
 };

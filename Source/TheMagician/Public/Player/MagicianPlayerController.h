@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
-#include "MainPlayerController.generated.h"
+#include "MagicianPlayerController.generated.h"
 
 class UInputMappingContext;
 class UInputAction;
@@ -15,12 +15,12 @@ struct FInputActionValue;
  * 
  */
 UCLASS()
-class THEMAGICIAN_API AMainPlayerController : public APlayerController
+class THEMAGICIAN_API AMagicianPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 
 public:
-	AMainPlayerController();
+	AMagicianPlayerController();
 	virtual void PlayerTick(float DeltaTime) override;
 
 protected:

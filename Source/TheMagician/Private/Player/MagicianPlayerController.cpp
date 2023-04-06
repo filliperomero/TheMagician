@@ -1,7 +1,7 @@
 // Copyright Fillipe Romero
 
 
-#include "Player/MainPlayerController.h"
+#include "Player/MagicianPlayerController.h"
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -9,19 +9,19 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Interaction/EnemyInterface.h"
 
-AMainPlayerController::AMainPlayerController()
+AMagicianPlayerController::AMagicianPlayerController()
 {
 	bReplicates = true;
 }
 
-void AMainPlayerController::PlayerTick(float DeltaTime)
+void AMagicianPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
 
 	CursorTrace();
 }
 
-void AMainPlayerController::BeginPlay()
+void AMagicianPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -42,7 +42,7 @@ void AMainPlayerController::BeginPlay()
 	}
 }
 
-void AMainPlayerController::SetupInputComponent()
+void AMagicianPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
@@ -52,7 +52,7 @@ void AMainPlayerController::SetupInputComponent()
 	EnhancedInputComponent->BindAction(MoveCameraAction, ETriggerEvent::Triggered, this, &ThisClass::MoveCamera);
 }
 
-void AMainPlayerController::Move(const FInputActionValue& InputActionValue)
+void AMagicianPlayerController::Move(const FInputActionValue& InputActionValue)
 {
 	const FVector2D InputAxisVector = InputActionValue.Get<FVector2D>();
 	const FRotator Rotation = GetControlRotation();
@@ -68,7 +68,7 @@ void AMainPlayerController::Move(const FInputActionValue& InputActionValue)
 	}
 }
 
-void AMainPlayerController::MoveCamera(const FInputActionValue& InputActionValue)
+void AMagicianPlayerController::MoveCamera(const FInputActionValue& InputActionValue)
 {
 	const float Value = InputActionValue.Get<float>();
 
@@ -84,7 +84,7 @@ void AMainPlayerController::MoveCamera(const FInputActionValue& InputActionValue
 	}
 }
 
-void AMainPlayerController::CursorTrace()
+void AMagicianPlayerController::CursorTrace()
 {
 	FHitResult CursorHit;
 	GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);

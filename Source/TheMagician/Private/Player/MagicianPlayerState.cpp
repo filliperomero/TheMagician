@@ -1,9 +1,9 @@
 // Copyright Fillipe Romero
 
 
-#include "Player/MainPlayerState.h"
+#include "Player/MagicianPlayerState.h"
 
-AMainPlayerState::AMainPlayerState()
+AMagicianPlayerState::AMagicianPlayerState()
 {
 	// How often the Server will try to update clients
 	NetUpdateFrequency = 100.f;
