@@ -17,7 +17,13 @@ class THEMAGICIAN_API AEnemy : public ABaseCharacter, public IEnemyInterface
 
 public:
 	AEnemy();
+
+	/** Begin Enemy Interface */
 	virtual void HighlightActor() override;
 	virtual void UnHighlightActor() override;
+	/** End Enemy Interface */
+
+protected:
+	virtual void BeginPlay() override;
 	
 };

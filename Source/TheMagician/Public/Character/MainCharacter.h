@@ -18,10 +18,14 @@ class THEMAGICIAN_API AMainCharacter : public ABaseCharacter
 
 public:
 	AMainCharacter();
+	virtual void PossessedBy(AController* NewController) override;
+	virtual void OnRep_PlayerState() override;
 
 protected:
 
 private:
+	void InitAbilityActorInfo();
+	
 	UPROPERTY(EditAnywhere, Category = Camera)
 	float MaxCameraBoomDistance = 750.f;
 	

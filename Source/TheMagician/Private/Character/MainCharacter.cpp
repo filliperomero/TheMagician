@@ -3,9 +3,11 @@
 
 #include "Character/MainCharacter.h"
 
+#include "AbilitySystemComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Player/MagicianPlayerState.h"
 
 AMainCharacter::AMainCharacter()
 {
@@ -31,4 +33,30 @@ AMainCharacter::AMainCharacter()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>("Follow Camera");
 	FollowCamera->SetupAttachment(CameraBoom);
 	FollowCamera->bUsePawnControlRotation = false;
+}
+
+void AMainCharacter::InitAbilityActorInfo()
+{
+	AMagicianPlayerState* MagicianPlayerState = GetPlayerState<AMagicianPlayerState>();
+	check(MagicianPlayerState);
+
+	MagicianPlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(MagicianPlayerState, this);
+	AbilitySystemComponent = MagicianPlayerState->GetAbilitySystemComponent();
+	AttributeSet = MagicianPlayerState->GetAttributeSet();
+}
+
+void AMainCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	// Init Ability Actor Info for the Server
+	InitAbilityActorInfo();
+}
+
+void AMainCharacter::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+
+	// Init Ability Actor Info for the Client
+	InitAbilityActorInfo();
 }
