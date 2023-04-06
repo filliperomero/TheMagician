@@ -13,6 +13,7 @@ AEnemy::AEnemy()
 	
 	AbilitySystemComponent = CreateDefaultSubobject<UMagicianAbilitySystemComponent>("AbilitySystemComponent");
 	AbilitySystemComponent->SetIsReplicated(true);
+	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
 	
 	AttributeSet = CreateDefaultSubobject<UMagicianAttributeSet>("AttributeSet");
 
