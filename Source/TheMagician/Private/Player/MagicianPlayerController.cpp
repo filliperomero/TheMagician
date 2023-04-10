@@ -27,19 +27,20 @@ void AMagicianPlayerController::BeginPlay()
 
 	check(InputContext);
 
+	// We should not check() here since we only going to get the Subsystem when we are locally controlled
 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 	{
-		Subsystem->AddMappingContext(InputContext, 0);
-
-		bShowMouseCursor = true;
-		DefaultMouseCursor = EMouseCursor::Default;
-
-		FInputModeGameAndUI InputModeData;
-		InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
-		InputModeData.SetHideCursorDuringCapture(false);
-		
-		SetInputMode(InputModeData);
+		Subsystem->AddMappingContext(InputContext, 0);		
 	}
+	
+	bShowMouseCursor = true;
+	DefaultMouseCursor = EMouseCursor::Default;
+
+	FInputModeGameAndUI InputModeData;
+	InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+	InputModeData.SetHideCursorDuringCapture(false);
+		
+	SetInputMode(InputModeData);
 }
 
 void AMagicianPlayerController::SetupInputComponent()

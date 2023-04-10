@@ -7,7 +7,9 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Player/MagicianPlayerController.h"
 #include "Player/MagicianPlayerState.h"
+#include "UI/HUD/MagicianHUD.h"
 
 AMainCharacter::AMainCharacter()
 {
@@ -43,6 +45,16 @@ void AMainCharacter::InitAbilityActorInfo()
 	MagicianPlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(MagicianPlayerState, this);
 	AbilitySystemComponent = MagicianPlayerState->GetAbilitySystemComponent();
 	AttributeSet = MagicianPlayerState->GetAttributeSet();
+
+	// In multiplayer, the PlayerController will be invalid in other people computers, since I can only get my PlayerController but not others
+	if (AMagicianPlayerController* MagicianPlayerController = Cast<AMagicianPlayerController>(GetController()))
+	{
+		// The HUD is also only valid to locally controller player
+		if (AMagicianHUD* MagicianHUD = Cast<AMagicianHUD>(MagicianPlayerController->GetHUD()))
+		{
+			MagicianHUD->InitOverlay(MagicianPlayerController, MagicianPlayerState, AbilitySystemComponent, AttributeSet);
+		}
+	}
 }
 
 void AMainCharacter::PossessedBy(AController* NewController)
