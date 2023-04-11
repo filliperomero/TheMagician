@@ -10,3 +10,7 @@ void UMagicianWidgetController::SetWidgetControllerParams(const FWidgetControlle
 	AbilitySystemComponent = WCParams.AbilitySystemComponent;
 	AttributeSet = WCParams.AttributeSet;
 }
+
+void UMagicianWidgetController::BroadcastInitialValues()
+{
+}

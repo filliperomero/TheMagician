@@ -30,6 +30,9 @@ void AMagicianHUD::InitOverlay(APlayerController* PC, APlayerState* PS, UAbility
 	UOverlayWidgetController* WidgetController = GetOverlayWidgetController(WidgetControllerParams);
 	
 	OverlayWidget->SetWidgetController(WidgetController);
+
+	// Broadcast all Initial Values
+	WidgetController->BroadcastInitialValues();
 	
 	Widget->AddToViewport();
 }
