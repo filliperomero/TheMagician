@@ -14,3 +14,7 @@ void UMagicianWidgetController::SetWidgetControllerParams(const FWidgetControlle
 void UMagicianWidgetController::BroadcastInitialValues()
 {
 }
+
+void UMagicianWidgetController::BindCallbacksToDependencies()
+{
+}
