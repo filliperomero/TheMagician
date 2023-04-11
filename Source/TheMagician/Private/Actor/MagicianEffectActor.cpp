@@ -40,6 +40,7 @@ void AMagicianEffectActor::OnOverlap(UPrimitiveComponent* OverlappedComponent, A
 		// Don't do that! This is for learning purpose only
 		UMagicianAttributeSet* MutableMagicianAttributeSet = const_cast<UMagicianAttributeSet*>(MagicianAttributeSet);
 		MutableMagicianAttributeSet->SetHealth(MagicianAttributeSet->GetHealth() + 20.f);
+		MutableMagicianAttributeSet->SetMana(MagicianAttributeSet->GetMana() - 10.f);
 
 		Destroy();
 	}
