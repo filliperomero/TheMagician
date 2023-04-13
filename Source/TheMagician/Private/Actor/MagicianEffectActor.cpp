@@ -2,51 +2,34 @@
 
 
 #include "Actor/MagicianEffectActor.h"
-
+#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
-#include "AbilitySystemInterface.h"
-#include "AbilitySystem/MagicianAttributeSet.h"
-#include "Components/SphereComponent.h"
 
 AMagicianEffectActor::AMagicianEffectActor()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
-	Mesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
-	SetRootComponent(Mesh);
-
-	Sphere = CreateDefaultSubobject<USphereComponent>("Sphere");
-	Sphere->SetupAttachment(GetRootComponent());
-	
+	SetRootComponent(CreateDefaultSubobject<USceneComponent>("SceneRoot"));
 }
 
 void AMagicianEffectActor::BeginPlay()
 {
 	Super::BeginPlay();
-
-	Sphere->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnOverlap);
-	Sphere->OnComponentEndOverlap.AddDynamic(this, &ThisClass::EndOverlap);
 }
 
-void AMagicianEffectActor::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AMagicianEffectActor::ApplyEffectToTarget(AActor* TargetActor, TSubclassOf<UGameplayEffect> GameplayEffectClass)
 {
-	// TODO: Change this to apply a Gameplay Effect. For now, using const_cast as a hack!
-	if (IAbilitySystemInterface* ASCInterface = Cast<IAbilitySystemInterface>(OtherActor))
-	{
-		// Very limited approach, we should use the Gameplay Effects. To be implemented later
-		const UMagicianAttributeSet* MagicianAttributeSet = Cast<UMagicianAttributeSet>(ASCInterface->GetAbilitySystemComponent()->GetAttributeSet(UMagicianAttributeSet::StaticClass()));
+	// Avoid the need to cast to IAbilitySystemInterface and checking it, then getting the AbilitySystem from it
+	UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
 
-		// Don't do that! This is for learning purpose only
-		UMagicianAttributeSet* MutableMagicianAttributeSet = const_cast<UMagicianAttributeSet*>(MagicianAttributeSet);
-		MutableMagicianAttributeSet->SetHealth(MagicianAttributeSet->GetHealth() + 20.f);
-		MutableMagicianAttributeSet->SetMana(MagicianAttributeSet->GetMana() - 10.f);
+	if (TargetASC == nullptr) return;
+	
+	check(GameplayEffectClass);
 
-		Destroy();
-	}
-}
+	FGameplayEffectContextHandle EffectContextHandle = TargetASC->MakeEffectContext();
+	EffectContextHandle.AddSourceObject(this); // If we want to know what object caused this effect, we can use the sourceObject
 
-void AMagicianEffectActor::EndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
+	const FGameplayEffectSpecHandle EffectSpecHandle = TargetASC->MakeOutgoingSpec(GameplayEffectClass, 1.f, EffectContextHandle);
+	// Applying the Gameplay Effect
+	TargetASC->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
 }
