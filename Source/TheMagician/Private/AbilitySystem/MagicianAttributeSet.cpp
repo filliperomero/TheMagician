@@ -32,13 +32,10 @@ void UMagicianAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribu
 	Super::PreAttributeChange(Attribute, NewValue);
 
 	if (Attribute == GetHealthAttribute())
-	{
 		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxHealth());
-	}
+	
 	if (Attribute == GetManaAttribute())
-	{
 		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxMana());
-	}
 }
 
 void UMagicianAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
@@ -46,14 +43,10 @@ void UMagicianAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCa
 	Super::PostGameplayEffectExecute(Data);
 
 	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
-	{
 		SetHealth(FMath::Clamp(GetHealth(), 0.f, GetMaxHealth()));
-	}
 	
 	if (Data.EvaluatedData.Attribute == GetManaAttribute())
-	{
 		SetMana(FMath::Clamp(GetMana(), 0.f, GetMaxMana()));
-	}
 }
 
 void UMagicianAttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth) const
