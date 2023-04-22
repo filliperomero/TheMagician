@@ -39,7 +39,7 @@ void AMagicianEffectActor::ApplyEffect(UAbilitySystemComponent* TargetActorASC, 
 	FGameplayEffectContextHandle EffectContextHandle = TargetActorASC->MakeEffectContext();
 	EffectContextHandle.AddSourceObject(this); // If we want to know what object caused this effect, we can use the sourceObject
 
-	const FGameplayEffectSpecHandle EffectSpecHandle = TargetActorASC->MakeOutgoingSpec(GameplayEffect.GameplayEffectClass, 1.f, EffectContextHandle);
+	const FGameplayEffectSpecHandle EffectSpecHandle = TargetActorASC->MakeOutgoingSpec(GameplayEffect.GameplayEffectClass, ActorLevel, EffectContextHandle);
 	// Apply the Gameplay Effect
 	const FActiveGameplayEffectHandle ActiveEffectHandle = TargetActorASC->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
 
