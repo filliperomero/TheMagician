@@ -1,9 +1,10 @@
 // Copyright Fillipe Romero
 
-
 #include "AbilitySystem/MagicianAttributeSet.h"
+#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "GameplayEffectExtension.h"
+#include "GameFramework/Character.h"
 #include "Net/UnrealNetwork.h"
 
 UMagicianAttributeSet::UMagicianAttributeSet()
@@ -38,9 +39,40 @@ void UMagicianAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribu
 		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxMana());
 }
 
+void UMagicianAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& Props) const
+{
+	// Source = Causer of the effect; Target = target of the effect (owner of this AS)
+
+	// Set Source values
+	Props.EffectContextHandle = Data.EffectSpec.GetContext();
+	Props.SourceASC = Props.EffectContextHandle.GetOriginalInstigatorAbilitySystemComponent();
+
+	// TODO: Double check if it's safe to use GetAvatarActor() instead of accessing directly and checking in our way
+	Props.SourceAvatarActor = Props.SourceASC->GetAvatarActor();
+	Props.SourceController = Props.SourceASC->AbilityActorInfo->PlayerController.Get();
+	
+	if (Props.SourceController == nullptr && Props.SourceAvatarActor != nullptr)
+	{
+		if (const APawn* Pawn = Cast<APawn>(Props.SourceAvatarActor))
+			Props.SourceController = Pawn->GetController();
+	}
+	
+	if (Props.SourceController)
+		Props.SourceCharacter = Cast<ACharacter>(Props.SourceController->GetPawn());
+
+	// Set Target values
+	Props.TargetAvatarActor = Data.Target.GetAvatarActor();
+	Props.TargetController = Data.Target.AbilityActorInfo->PlayerController.Get();
+	Props.TargetCharacter = Cast<ACharacter>(Props.TargetAvatarActor);
+	Props.TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Props.TargetAvatarActor);
+}
+
 void UMagicianAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
 {
 	Super::PostGameplayEffectExecute(Data);
+
+	FEffectProperties Props;
+	SetEffectProperties(Data, Props);
 
 	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
 		SetHealth(FMath::Clamp(GetHealth(), 0.f, GetMaxHealth()));
