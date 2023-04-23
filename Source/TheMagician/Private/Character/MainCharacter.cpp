@@ -4,6 +4,7 @@
 #include "Character/MainCharacter.h"
 
 #include "AbilitySystemComponent.h"
+#include "AbilitySystem/MagicianAbilitySystemComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -43,6 +44,8 @@ void AMainCharacter::InitAbilityActorInfo()
 	check(MagicianPlayerState);
 
 	MagicianPlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(MagicianPlayerState, this);
+	Cast<UMagicianAbilitySystemComponent>(MagicianPlayerState->GetAbilitySystemComponent())->AbilityActorInfoSet();
+	
 	AbilitySystemComponent = MagicianPlayerState->GetAbilitySystemComponent();
 	AttributeSet = MagicianPlayerState->GetAttributeSet();
 

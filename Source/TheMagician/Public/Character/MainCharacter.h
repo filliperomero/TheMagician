@@ -22,9 +22,9 @@ public:
 	virtual void OnRep_PlayerState() override;
 
 protected:
+	virtual void InitAbilityActorInfo() override;
 
 private:
-	void InitAbilityActorInfo();
 	
 	UPROPERTY(EditAnywhere, Category = Camera)
 	float MaxCameraBoomDistance = 750.f;
