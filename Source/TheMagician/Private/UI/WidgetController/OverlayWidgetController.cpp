@@ -3,6 +3,7 @@
 
 #include "UI/WidgetController/OverlayWidgetController.h"
 
+#include "AbilitySystem/MagicianAbilitySystemComponent.h"
 #include "AbilitySystem/MagicianAttributeSet.h"
 
 void UOverlayWidgetController::BroadcastInitialValues()
@@ -34,6 +35,20 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
 		MagicianAttributeSet->GetMaxManaAttribute()).AddUObject(this, &ThisClass::MaxManaChanged);
+
+	UMagicianAbilitySystemComponent* MagicianAbilitySystemComponent = CastChecked<UMagicianAbilitySystemComponent>(AbilitySystemComponent);
+
+	MagicianAbilitySystemComponent->EffectAssetTags.AddLambda(
+		[](const FGameplayTagContainer& AssetTags)
+		{
+			// We're using reference here so we don't make a copy of it
+			for (const FGameplayTag& Tag : AssetTags)
+			{
+				const FString Message = FString::Printf(TEXT("GE Tag: %s"), *Tag.ToString());
+				GEngine->AddOnScreenDebugMessage(-1, 8.f, FColor::Blue, Message);
+			}
+		}
+	);
 }
 
 void UOverlayWidgetController::HealthChanged(const FOnAttributeChangeData& Data) const

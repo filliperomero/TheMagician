@@ -6,6 +6,8 @@
 #include "AbilitySystemComponent.h"
 #include "MagicianAbilitySystemComponent.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FEffectAssetTags, const FGameplayTagContainer& /* AssetTags */)
+
 /**
  * 
  */
@@ -16,6 +18,8 @@ class THEMAGICIAN_API UMagicianAbilitySystemComponent : public UAbilitySystemCom
 
 public:
 	void AbilityActorInfoSet();
+
+	FEffectAssetTags EffectAssetTags;
 
 protected:
 	void EffectApplied(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle);
