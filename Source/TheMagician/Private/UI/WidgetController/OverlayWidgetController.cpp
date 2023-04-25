@@ -39,13 +39,18 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 	UMagicianAbilitySystemComponent* MagicianAbilitySystemComponent = CastChecked<UMagicianAbilitySystemComponent>(AbilitySystemComponent);
 
 	MagicianAbilitySystemComponent->EffectAssetTags.AddLambda(
-		[](const FGameplayTagContainer& AssetTags)
+		[this](const FGameplayTagContainer& AssetTags)
 		{
 			// We're using reference here so we don't make a copy of it
 			for (const FGameplayTag& Tag : AssetTags)
 			{
-				const FString Message = FString::Printf(TEXT("GE Tag: %s"), *Tag.ToString());
-				GEngine->AddOnScreenDebugMessage(-1, 8.f, FColor::Blue, Message);
+				FGameplayTag MessageTag = FGameplayTag::RequestGameplayTag(FName("Message"));
+				
+				if (Tag.MatchesTag(MessageTag))
+				{
+					const FUIWidgetRow* Row = GetDataTableRowByTag<FUIWidgetRow>(MessageWidgetDataTable, Tag);
+					MessageWidgetRowDelegate.Broadcast(*Row);
+				}
 			}
 		}
 	);
