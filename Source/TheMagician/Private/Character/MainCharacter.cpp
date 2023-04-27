@@ -58,6 +58,8 @@ void AMainCharacter::InitAbilityActorInfo()
 			MagicianHUD->InitOverlay(MagicianPlayerController, MagicianPlayerState, AbilitySystemComponent, AttributeSet);
 		}
 	}
+
+	InitializePrimaryAttributes();
 }
 
 void AMainCharacter::PossessedBy(AController* NewController)

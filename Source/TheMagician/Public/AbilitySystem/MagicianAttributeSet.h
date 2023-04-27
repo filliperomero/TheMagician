@@ -77,7 +77,6 @@ public:
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Vitality, Category = "Primary Attributes")
 	FGameplayAttributeData Vitality;
 	ATTRIBUTE_ACCESSORS(UMagicianAttributeSet, Vitality);
-
 	/** End Primary Attributes */
 
 	/** Begin Vital Attributes */
@@ -124,4 +123,5 @@ public:
 
 private:
 	void SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& Props) const;
+	
 };
