@@ -14,10 +14,16 @@ UMagicianAttributeSet::UMagicianAttributeSet()
 	InitMana(50.f);
 	InitMaxMana(75.f);
 }
-
+	
 void UMagicianAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	// Primary Attributes
+	DOREPLIFETIME_CONDITION_NOTIFY(UMagicianAttributeSet, Strength, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UMagicianAttributeSet, Intelligence, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UMagicianAttributeSet, Resilience, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UMagicianAttributeSet, Vitality, COND_None, REPNOTIFY_Always);
 
 	// Register Health to replicate
 	// COND_None = We always want to replicate
@@ -98,4 +104,24 @@ void UMagicianAttributeSet::OnRep_Mana(const FGameplayAttributeData& OldMana) co
 void UMagicianAttributeSet::OnRep_MaxMana(const FGameplayAttributeData& OldMaxMana) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UMagicianAttributeSet, MaxMana, OldMaxMana);
+}
+
+void UMagicianAttributeSet::OnRep_Strength(const FGameplayAttributeData& OldStrength) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UMagicianAttributeSet, Strength, OldStrength);
+}
+
+void UMagicianAttributeSet::OnRep_Intelligence(const FGameplayAttributeData& OldIntelligence) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UMagicianAttributeSet, Intelligence, OldIntelligence);
+}
+
+void UMagicianAttributeSet::OnRep_Resilience(const FGameplayAttributeData& OldResilience) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UMagicianAttributeSet, Resilience, OldResilience);
+}
+
+void UMagicianAttributeSet::OnRep_Vitality(const FGameplayAttributeData& OldVitality) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UMagicianAttributeSet, Vitality, OldVitality);
 }
