@@ -46,8 +46,6 @@ void UMagicianAttributeSet::SetEffectProperties(const FGameplayEffectModCallback
 	// Set Source values
 	Props.EffectContextHandle = Data.EffectSpec.GetContext();
 	Props.SourceASC = Props.EffectContextHandle.GetOriginalInstigatorAbilitySystemComponent();
-
-	// TODO: Double check if it's safe to use GetAvatarActor() instead of accessing directly and checking in our way
 	Props.SourceAvatarActor = Props.SourceASC->GetAvatarActor();
 	Props.SourceController = Props.SourceASC->AbilityActorInfo->PlayerController.Get();
 	
