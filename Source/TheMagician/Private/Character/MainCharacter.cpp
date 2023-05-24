@@ -59,7 +59,7 @@ void AMainCharacter::InitAbilityActorInfo()
 		}
 	}
 
-	InitializePrimaryAttributes();
+	InitializeDefaultAttributes();
 }
 
 void AMainCharacter::PossessedBy(AController* NewController)
