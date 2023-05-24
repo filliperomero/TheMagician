@@ -25,13 +25,24 @@ void UMagicianAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 	DOREPLIFETIME_CONDITION_NOTIFY(UMagicianAttributeSet, Resilience, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UMagicianAttributeSet, Vitality, COND_None, REPNOTIFY_Always);
 
+	// Secondary Attributes
+	DOREPLIFETIME_CONDITION_NOTIFY(UMagicianAttributeSet, Armor, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UMagicianAttributeSet, ArmorPenetration, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UMagicianAttributeSet, BlockChance, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UMagicianAttributeSet, CriticalHitChance, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UMagicianAttributeSet, CriticalHitDamage, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UMagicianAttributeSet, CriticalHitResistance, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UMagicianAttributeSet, HealthRegeneration, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UMagicianAttributeSet, ManaRegeneration, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UMagicianAttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UMagicianAttributeSet, MaxMana, COND_None, REPNOTIFY_Always);
+
 	// Register Health to replicate
 	// COND_None = We always want to replicate
 	// REPNOTIFY_Always = If the value is set in the server, it will always replicate even if the variable is the same
+	// Vital Attributes
 	DOREPLIFETIME_CONDITION_NOTIFY(UMagicianAttributeSet, Health, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(UMagicianAttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UMagicianAttributeSet, Mana, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(UMagicianAttributeSet, MaxMana, COND_None, REPNOTIFY_Always);
 }
 
 void UMagicianAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
@@ -124,4 +135,44 @@ void UMagicianAttributeSet::OnRep_Resilience(const FGameplayAttributeData& OldRe
 void UMagicianAttributeSet::OnRep_Vitality(const FGameplayAttributeData& OldVitality) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UMagicianAttributeSet, Vitality, OldVitality);
+}
+
+void UMagicianAttributeSet::OnRep_Armor(const FGameplayAttributeData& OldArmor) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UMagicianAttributeSet, Armor, OldArmor);
+}
+
+void UMagicianAttributeSet::OnRep_ArmorPenetration(const FGameplayAttributeData& OldArmorPenetration) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UMagicianAttributeSet, ArmorPenetration, OldArmorPenetration);
+}
+
+void UMagicianAttributeSet::OnRep_BlockChance(const FGameplayAttributeData& OldBlockChance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UMagicianAttributeSet, BlockChance, OldBlockChance);
+}
+
+void UMagicianAttributeSet::OnRep_CriticalHitChance(const FGameplayAttributeData& OldCriticalHitChance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UMagicianAttributeSet, CriticalHitChance, OldCriticalHitChance);
+}
+
+void UMagicianAttributeSet::OnRep_CriticalHitDamage(const FGameplayAttributeData& OldCriticalHitDamage) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UMagicianAttributeSet, CriticalHitDamage, OldCriticalHitDamage);
+}
+
+void UMagicianAttributeSet::OnRep_CriticalHitResistance(const FGameplayAttributeData& OldCriticalHitResistance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UMagicianAttributeSet, CriticalHitResistance, OldCriticalHitResistance);
+}
+
+void UMagicianAttributeSet::OnRep_HealthRegeneration(const FGameplayAttributeData& OldHealthRegeneration) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UMagicianAttributeSet, HealthRegeneration, OldHealthRegeneration);
+}
+
+void UMagicianAttributeSet::OnRep_ManaRegeneration(const FGameplayAttributeData& OldManaRegeneration) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UMagicianAttributeSet, ManaRegeneration, OldManaRegeneration);
 }
