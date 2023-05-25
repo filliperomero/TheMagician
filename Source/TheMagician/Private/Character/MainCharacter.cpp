@@ -77,3 +77,11 @@ void AMainCharacter::OnRep_PlayerState()
 	// Init Ability Actor Info for the Client
 	InitAbilityActorInfo();
 }
+
+int32 AMainCharacter::GetPlayerLevel()
+{
+	const AMagicianPlayerState* MagicianPlayerState = GetPlayerState<AMagicianPlayerState>();
+	check(MagicianPlayerState);
+
+	return MagicianPlayerState->GetPlayerLevel();
+}

@@ -20,6 +20,7 @@ class THEMAGICIAN_API AMagicianPlayerState : public APlayerState, public IAbilit
 
 public:
 	AMagicianPlayerState();
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 protected:
@@ -29,7 +30,15 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UAttributeSet> AttributeSet;
 
+private:
+	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_Level)
+	int32 Level { 1 };
+
+	UFUNCTION()
+	void OnRep_Level(int32 OldLevel);
+
 public:
 	FORCEINLINE UAttributeSet* GetAttributeSet() const { return AttributeSet; }
+	FORCEINLINE int32 GetPlayerLevel() const { return Level; }
 	
 };

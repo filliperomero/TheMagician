@@ -5,6 +5,7 @@
 
 #include "AbilitySystem/MagicianAbilitySystemComponent.h"
 #include "AbilitySystem/MagicianAttributeSet.h"
+#include "Net/UnrealNetwork.h"
 
 AMagicianPlayerState::AMagicianPlayerState()
 {
@@ -18,7 +19,18 @@ AMagicianPlayerState::AMagicianPlayerState()
 	AttributeSet = CreateDefaultSubobject<UMagicianAttributeSet>("AttributeSet");
 }
 
+void AMagicianPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AMagicianPlayerState, Level);
+}
+
 UAbilitySystemComponent* AMagicianPlayerState::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
+}
+
+void AMagicianPlayerState::OnRep_Level(int32 OldLevel)
+{
 }

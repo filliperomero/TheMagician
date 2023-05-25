@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
+#include "Interaction/CombatInterface.h"
 #include "BaseCharacter.generated.h"
 
 class UGameplayEffect;
@@ -13,7 +14,7 @@ class UAttributeSet;
 
 // Putting Abstract here will disable the ability to create BP from it
 UCLASS(Abstract)
-class THEMAGICIAN_API ABaseCharacter : public ACharacter, public IAbilitySystemInterface
+class THEMAGICIAN_API ABaseCharacter : public ACharacter, public IAbilitySystemInterface, public ICombatInterface
 {
 	GENERATED_BODY()
 
