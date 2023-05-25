@@ -47,7 +47,7 @@ private:
 
 	void CursorTrace();
 
-	TObjectPtr<IEnemyInterface> LastHoveredActor;
-	TObjectPtr<IEnemyInterface> CurrentHoveredActor;
+	IEnemyInterface* LastHoveredActor;
+	IEnemyInterface* CurrentHoveredActor;
 	
 };
