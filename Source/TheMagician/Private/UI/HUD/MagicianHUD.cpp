@@ -3,6 +3,7 @@
 
 #include "UI/HUD/MagicianHUD.h"
 #include "UI/Widget/MagicianUserWidget.h"
+#include "UI/WidgetController/AttributeMenuWidgetController.h"
 #include "UI/WidgetController/OverlayWidgetController.h"
 
 UOverlayWidgetController* AMagicianHUD::GetOverlayWidgetController(const FWidgetControllerParams& WCParams)
@@ -12,11 +13,21 @@ UOverlayWidgetController* AMagicianHUD::GetOverlayWidgetController(const FWidget
 		OverlayWidgetController = NewObject<UOverlayWidgetController>(this, OverlayWidgetControllerClass);
 		OverlayWidgetController->SetWidgetControllerParams(WCParams);
 		OverlayWidgetController->BindCallbacksToDependencies();
-
-		return OverlayWidgetController;
 	}
 
 	return OverlayWidgetController;
+}
+
+UAttributeMenuWidgetController* AMagicianHUD::GetAttributeMenuWidgetController(const FWidgetControllerParams& WCParams)
+{
+	if (AttributeMenuWidgetController == nullptr)
+	{
+		AttributeMenuWidgetController = NewObject<UAttributeMenuWidgetController>(this, AttributeMenuWidgetControllerClass);
+		AttributeMenuWidgetController->SetWidgetControllerParams(WCParams);
+		AttributeMenuWidgetController->BindCallbacksToDependencies();
+	}
+
+	return AttributeMenuWidgetController;
 }
 
 void AMagicianHUD::InitOverlay(APlayerController* PC, APlayerState* PS, UAbilitySystemComponent* ASC, UAttributeSet* AS)

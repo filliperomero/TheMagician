@@ -26,3 +26,23 @@ UOverlayWidgetController* UMagicianAbilitySystemLibrary::GetOverlayWidgetControl
 
 	return nullptr;
 }
+
+UAttributeMenuWidgetController* UMagicianAbilitySystemLibrary::GetAttributeMenuWidgetController(
+	const UObject* WorldContextObject)
+{
+	if (APlayerController* PC = UGameplayStatics::GetPlayerController(WorldContextObject, 0))
+	{
+		if(AMagicianHUD* MagicianHUD = Cast<AMagicianHUD>(PC->GetHUD()))
+		{
+			AMagicianPlayerState* PS = PC->GetPlayerState<AMagicianPlayerState>();
+			UAbilitySystemComponent* ASC = PS->GetAbilitySystemComponent();
+			UAttributeSet* AS = PS->GetAttributeSet();
+
+			const FWidgetControllerParams WidgetControllerParams(PC, PS, ASC, AS);
+
+			return MagicianHUD->GetAttributeMenuWidgetController(WidgetControllerParams);
+		}
+	}
+
+	return nullptr;
+}

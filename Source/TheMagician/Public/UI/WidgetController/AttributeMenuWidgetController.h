@@ -9,7 +9,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(BlueprintType, Blueprintable)
 class THEMAGICIAN_API UAttributeMenuWidgetController : public UMagicianWidgetController
 {
 	GENERATED_BODY()

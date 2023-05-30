@@ -6,6 +6,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "MagicianAbilitySystemLibrary.generated.h"
 
+class UAttributeMenuWidgetController;
 class UOverlayWidgetController;
 /**
  * 
@@ -18,5 +19,8 @@ class THEMAGICIAN_API UMagicianAbilitySystemLibrary : public UBlueprintFunctionL
 public:
 	UFUNCTION(BlueprintPure, Category = "MagicianAbilitySystemLibrary | WidgetController")
 	static UOverlayWidgetController* GetOverlayWidgetController(const UObject* WorldContextObject);
+
 	
+	UFUNCTION(BlueprintPure, Category = "MagicianAbilitySystemLibrary | WidgetController")
+	static UAttributeMenuWidgetController* GetAttributeMenuWidgetController(const UObject* WorldContextObject);
 };
