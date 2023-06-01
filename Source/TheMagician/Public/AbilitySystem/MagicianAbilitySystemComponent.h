@@ -18,6 +18,7 @@ class THEMAGICIAN_API UMagicianAbilitySystemComponent : public UAbilitySystemCom
 
 public:
 	void AbilityActorInfoSet();
+	void AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupAbilities);
 
 	FEffectAssetTags EffectAssetTags;
 

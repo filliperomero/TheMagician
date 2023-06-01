@@ -2,6 +2,7 @@
 
 #include "Character/BaseCharacter.h"
 #include "AbilitySystemComponent.h"
+#include "AbilitySystem/MagicianAbilitySystemComponent.h"
 
 ABaseCharacter::ABaseCharacter()
 {
@@ -45,4 +46,14 @@ void ABaseCharacter::InitializeDefaultAttributes() const
 
 	// Must be after Secondary Attributes
 	ApplyEffectToSelf(DefaultVitalAttributes, 1.f);
+}
+
+void ABaseCharacter::AddCharacterAbilities()
+{
+	// Should only happens in the Server
+	if (!HasAuthority()) return;
+
+	UMagicianAbilitySystemComponent* MagicianASC = CastChecked<UMagicianAbilitySystemComponent>(AbilitySystemComponent);
+
+	MagicianASC->AddCharacterAbilities(StartupAbilities);
 }
