@@ -3,10 +3,10 @@
 
 #include "Player/MagicianPlayerController.h"
 
-#include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Character/MainCharacter.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Input/MagicianInputComponent.h"
 #include "Interaction/EnemyInterface.h"
 
 AMagicianPlayerController::AMagicianPlayerController()
@@ -47,10 +47,12 @@ void AMagicianPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
+	UMagicianInputComponent* MagicianInputComponent = CastChecked<UMagicianInputComponent>(InputComponent);
 	
-	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ThisClass::Move);
-	EnhancedInputComponent->BindAction(MoveCameraAction, ETriggerEvent::Triggered, this, &ThisClass::MoveCamera);
+	MagicianInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ThisClass::Move);
+	MagicianInputComponent->BindAction(MoveCameraAction, ETriggerEvent::Triggered, this, &ThisClass::MoveCamera);
+
+	MagicianInputComponent->BindAbilityActions(InputConfig, this, &ThisClass::AbilityInputTagPressed, &ThisClass::AbilityInputTagReleased, &ThisClass::AbilityInputTagHeld);
 }
 
 void AMagicianPlayerController::Move(const FInputActionValue& InputActionValue)
@@ -126,4 +128,19 @@ void AMagicianPlayerController::CursorTrace()
 			CurrentHoveredActor->HighlightActor();
 		}
 	}
+}
+
+void AMagicianPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
+{
+	GEngine->AddOnScreenDebugMessage(1, 3.f, FColor::Red, *InputTag.ToString());
+}
+
+void AMagicianPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
+{
+	GEngine->AddOnScreenDebugMessage(2, 3.f, FColor::Blue, *InputTag.ToString());
+}
+
+void AMagicianPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
+{
+	GEngine->AddOnScreenDebugMessage(3, 3.f, FColor::Green, *InputTag.ToString());
 }

@@ -30,7 +30,7 @@ class THEMAGICIAN_API UMagicianInputConfig : public UDataAsset
 public:
 	const UInputAction* FindAbilityInputActionByTag(const FGameplayTag& InputTag, bool bLogNotFound = false) const;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Inputs)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Input)
 	TArray<FMagicianInputAction> AbilityInputActions;
 	
 };
