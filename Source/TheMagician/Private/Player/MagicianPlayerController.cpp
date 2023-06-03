@@ -3,7 +3,9 @@
 
 #include "Player/MagicianPlayerController.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "EnhancedInputSubsystems.h"
+#include "AbilitySystem/MagicianAbilitySystemComponent.h"
 #include "Character/MainCharacter.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Input/MagicianInputComponent.h"
@@ -53,6 +55,14 @@ void AMagicianPlayerController::SetupInputComponent()
 	MagicianInputComponent->BindAction(MoveCameraAction, ETriggerEvent::Triggered, this, &ThisClass::MoveCamera);
 
 	MagicianInputComponent->BindAbilityActions(InputConfig, this, &ThisClass::AbilityInputTagPressed, &ThisClass::AbilityInputTagReleased, &ThisClass::AbilityInputTagHeld);
+}
+
+UMagicianAbilitySystemComponent* AMagicianPlayerController::GetASC()
+{
+	if (MagicianAbilitySystemComponent == nullptr)
+		MagicianAbilitySystemComponent = Cast<UMagicianAbilitySystemComponent>(UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetPawn<APawn>()));
+
+	return MagicianAbilitySystemComponent;
 }
 
 void AMagicianPlayerController::Move(const FInputActionValue& InputActionValue)
@@ -132,15 +142,18 @@ void AMagicianPlayerController::CursorTrace()
 
 void AMagicianPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 {
-	GEngine->AddOnScreenDebugMessage(1, 3.f, FColor::Red, *InputTag.ToString());
 }
 
 void AMagicianPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 {
-	GEngine->AddOnScreenDebugMessage(2, 3.f, FColor::Blue, *InputTag.ToString());
+	if (GetASC() == nullptr) return;
+	
+	GetASC()->AbilityInputTagReleased(InputTag);
 }
 
 void AMagicianPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 {
-	GEngine->AddOnScreenDebugMessage(3, 3.f, FColor::Green, *InputTag.ToString());
+	if (GetASC() == nullptr) return;
+	
+	GetASC()->AbilityInputTagHeld(InputTag);
 }

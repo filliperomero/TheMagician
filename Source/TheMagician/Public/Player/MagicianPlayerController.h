@@ -7,6 +7,7 @@
 #include "GameplayTagContainer.h"
 #include "MagicianPlayerController.generated.h"
 
+class UMagicianAbilitySystemComponent;
 class UMagicianInputConfig;
 class UInputMappingContext;
 class UInputAction;
@@ -30,6 +31,11 @@ protected:
 	virtual void SetupInputComponent() override;
 
 private:
+	UMagicianAbilitySystemComponent* GetASC();
+	
+	UPROPERTY()
+	TObjectPtr<UMagicianAbilitySystemComponent> MagicianAbilitySystemComponent;
+	
 	UPROPERTY(EditAnywhere, Category = Camera)
 	float CameraZoomRate = 40.f;
 	
