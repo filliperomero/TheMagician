@@ -12,6 +12,7 @@ class UMagicianInputConfig;
 class UInputMappingContext;
 class UInputAction;
 class IEnemyInterface;
+class USplineComponent;
 struct FInputActionValue;
 
 /**
@@ -53,6 +54,7 @@ private:
 	void Move(const FInputActionValue& InputActionValue);
 	void MoveCamera(const FInputActionValue& InputActionValue);
 
+	FHitResult CursorHit;
 	void CursorTrace();
 
 	IEnemyInterface* LastHoveredActor;
@@ -64,5 +66,19 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = Input)
 	TObjectPtr<UMagicianInputConfig> InputConfig;
+
+	/** Click To Move */
+	void AutoRun();
+	FVector CachedDestination = FVector::ZeroVector;
+	float FollowTime { 0.f };
+	float ShortPressThreshold { 0.5f };
+	bool bAutoRunning = false;
+	bool bTargeting = false;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Click to Move Properties")
+	float AutoRunningAcceptanceRadius { 50.f };
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<USplineComponent> Spline;
 	
 };

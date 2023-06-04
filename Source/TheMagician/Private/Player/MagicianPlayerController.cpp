@@ -5,8 +5,12 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "EnhancedInputSubsystems.h"
+#include "MagicianGameplayTags.h"
+#include "NavigationPath.h"
+#include "NavigationSystem.h"
 #include "AbilitySystem/MagicianAbilitySystemComponent.h"
 #include "Character/MainCharacter.h"
+#include "Components/SplineComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Input/MagicianInputComponent.h"
 #include "Interaction/EnemyInterface.h"
@@ -14,6 +18,8 @@
 AMagicianPlayerController::AMagicianPlayerController()
 {
 	bReplicates = true;
+
+	Spline = CreateDefaultSubobject<USplineComponent>("Spline");
 }
 
 void AMagicianPlayerController::PlayerTick(float DeltaTime)
@@ -21,6 +27,24 @@ void AMagicianPlayerController::PlayerTick(float DeltaTime)
 	Super::PlayerTick(DeltaTime);
 
 	CursorTrace();
+	if (bAutoRunning) AutoRun();
+}
+
+void AMagicianPlayerController::AutoRun()
+{
+	if (APawn* ControlledPawn = GetPawn())
+	{
+		const FVector LocationOnSpline = Spline->FindLocationClosestToWorldLocation(ControlledPawn->GetActorLocation(), ESplineCoordinateSpace::World);
+		const FVector Direction = Spline->FindDirectionClosestToWorldLocation(LocationOnSpline, ESplineCoordinateSpace::World);
+
+		ControlledPawn->AddMovementInput(Direction);
+
+		const float DistanceToDestination = (LocationOnSpline - CachedDestination).Length();
+		if (DistanceToDestination <= AutoRunningAcceptanceRadius)
+		{
+			bAutoRunning = false;
+		}
+	}
 }
 
 void AMagicianPlayerController::BeginPlay()
@@ -99,7 +123,6 @@ void AMagicianPlayerController::MoveCamera(const FInputActionValue& InputActionV
 
 void AMagicianPlayerController::CursorTrace()
 {
-	FHitResult CursorHit;
 	GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);
 
 	// Didn't hit anything
@@ -142,18 +165,77 @@ void AMagicianPlayerController::CursorTrace()
 
 void AMagicianPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 {
+	if (InputTag.MatchesTagExact(FMagicianGameplayTags::Get().InputTag_LMB))
+	{
+		bTargeting = CurrentHoveredActor ? true : false;
+		bAutoRunning = false;
+	}
 }
 
 void AMagicianPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 {
-	if (GetASC() == nullptr) return;
-	
-	GetASC()->AbilityInputTagReleased(InputTag);
+	if (!InputTag.MatchesTagExact(FMagicianGameplayTags::Get().InputTag_LMB))
+	{
+		if (GetASC()) GetASC()->AbilityInputTagReleased(InputTag);
+
+		return;
+	}
+
+	if (bTargeting)
+	{
+		if (GetASC()) GetASC()->AbilityInputTagReleased(InputTag);
+	}
+	else
+	{
+		const APawn* ControlledPawn = GetPawn();
+		if (FollowTime <= ShortPressThreshold && ControlledPawn)
+		{
+			// Create a Navigation Path
+			UNavigationPath* NavPath = UNavigationSystemV1::FindPathToLocationSynchronously(this, ControlledPawn->GetActorLocation(), CachedDestination);
+			if (NavPath)
+			{
+				Spline->ClearSplinePoints();
+				if (!NavPath->PathPoints.IsEmpty())
+				{
+					for (const FVector& PointLoc : NavPath->PathPoints)
+					{
+						Spline->AddSplinePoint(PointLoc, ESplineCoordinateSpace::World);
+						DrawDebugSphere(GetWorld(), PointLoc, 8.f, 8, FColor::Red, false, 10.f);
+					}
+					CachedDestination = NavPath->PathPoints[NavPath->PathPoints.Num() - 1];
+					bAutoRunning = true;
+				}
+			}
+		}
+
+		FollowTime = 0.f;
+		bTargeting = false;
+	}
 }
 
 void AMagicianPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 {
-	if (GetASC() == nullptr) return;
-	
-	GetASC()->AbilityInputTagHeld(InputTag);
+	if (!InputTag.MatchesTagExact(FMagicianGameplayTags::Get().InputTag_LMB))
+	{
+		if (GetASC()) GetASC()->AbilityInputTagHeld(InputTag);
+
+		return;
+	}
+
+	if (bTargeting)
+	{
+		if (GetASC()) GetASC()->AbilityInputTagHeld(InputTag);
+	}
+	else
+	{
+		FollowTime += GetWorld()->GetDeltaSeconds();
+
+		if (CursorHit.bBlockingHit) CachedDestination = CursorHit.ImpactPoint;
+
+		if (APawn* ControlledPawn = GetPawn())
+		{
+			const FVector WorldDirection = (CachedDestination - ControlledPawn->GetActorLocation()).GetSafeNormal();
+			ControlledPawn->AddMovementInput(WorldDirection);
+		}
+	}
 }
