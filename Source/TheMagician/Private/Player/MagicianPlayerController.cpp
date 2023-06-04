@@ -131,35 +131,10 @@ void AMagicianPlayerController::CursorTrace()
 	LastHoveredActor = CurrentHoveredActor;
 	CurrentHoveredActor = Cast<IEnemyInterface>(CursorHit.GetActor());
 
-	/**
-	 * Line Trace from cursor. There are several Scenarios:
-	 *	A. LastActor is null && ThisActor is null
-	 *		- Do nothing
-	 *	B. LastActor is null && ThisActor is valid
-	 *		- Highlight ThisActor
-	 *	C. LastActor is valid && ThisActor is null
-	 *		- UnHighlight LastActor
-	 *	D. Both actors are valid, but LastActor != ThisActor
-	 *		- UnHighlight LastActor and Highlight ThisActor
-	 *	E. Both actors are valid, and are the same actor
-	 *		- Do nothing
-	 */
-
-	if (LastHoveredActor == nullptr)
+	if (LastHoveredActor != CurrentHoveredActor)
 	{
-		if (CurrentHoveredActor != nullptr) CurrentHoveredActor->HighlightActor();
-	}
-	else
-	{
-		if (CurrentHoveredActor == nullptr)
-		{
-			LastHoveredActor->UnHighlightActor();
-		}
-		else if (LastHoveredActor != CurrentHoveredActor)
-		{
-			LastHoveredActor->UnHighlightActor();
-			CurrentHoveredActor->HighlightActor();
-		}
+		if (LastHoveredActor) LastHoveredActor->UnHighlightActor();
+		if (CurrentHoveredActor) CurrentHoveredActor->HighlightActor();
 	}
 }
 
@@ -200,7 +175,6 @@ void AMagicianPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 					for (const FVector& PointLoc : NavPath->PathPoints)
 					{
 						Spline->AddSplinePoint(PointLoc, ESplineCoordinateSpace::World);
-						DrawDebugSphere(GetWorld(), PointLoc, 8.f, 8, FColor::Red, false, 10.f);
 					}
 					CachedDestination = NavPath->PathPoints[NavPath->PathPoints.Num() - 1];
 					bAutoRunning = true;
