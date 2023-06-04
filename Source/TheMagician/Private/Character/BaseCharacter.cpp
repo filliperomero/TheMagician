@@ -57,3 +57,9 @@ void ABaseCharacter::AddCharacterAbilities()
 
 	MagicianASC->AddCharacterAbilities(StartupAbilities);
 }
+
+FVector ABaseCharacter::GetCombatSocketLocation()
+{
+	check(Weapon);
+	return Weapon->GetSocketLocation(WeaponTipSocketName);
+}

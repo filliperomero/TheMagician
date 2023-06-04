@@ -9,6 +9,7 @@
 AMagicianProjectile::AMagicianProjectile()
 {
 	PrimaryActorTick.bCanEverTick = false;
+	bReplicates = true; // Since we want to spawn it in the server and replicates on the clients
 
 	Sphere = CreateDefaultSubobject<USphereComponent>("Sphere");
 	SetRootComponent(Sphere);
