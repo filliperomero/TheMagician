@@ -10,8 +10,11 @@ void UMagicianProjectileSpell::ActivateAbility(const FGameplayAbilitySpecHandle 
                                                const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+}
 
-	if (!HasAuthority(&ActivationInfo)) return;
+void UMagicianProjectileSpell::SpawnProjectile()
+{
+	if (GetAvatarActorFromActorInfo() == nullptr || !GetAvatarActorFromActorInfo()->HasAuthority()) return;
 
 	if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(GetAvatarActorFromActorInfo()))
 	{
