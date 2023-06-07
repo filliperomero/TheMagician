@@ -2,6 +2,8 @@
 
 
 #include "MagicianAssetManager.h"
+
+#include "AbilitySystemGlobals.h"
 #include "MagicianGameplayTags.h"
 
 UMagicianAssetManager& UMagicianAssetManager::Get()
@@ -18,4 +20,6 @@ void UMagicianAssetManager::StartInitialLoading()
 	Super::StartInitialLoading();
 
 	FMagicianGameplayTags::InitializeNativeGameplayTags();
+	// This is required to use Target Data!
+	UAbilitySystemGlobals::Get().InitGlobalData();
 }
