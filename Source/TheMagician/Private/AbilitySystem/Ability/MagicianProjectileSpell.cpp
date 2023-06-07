@@ -12,17 +12,19 @@ void UMagicianProjectileSpell::ActivateAbility(const FGameplayAbilitySpecHandle 
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
-void UMagicianProjectileSpell::SpawnProjectile()
+void UMagicianProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocation)
 {
 	if (GetAvatarActorFromActorInfo() == nullptr || !GetAvatarActorFromActorInfo()->HasAuthority()) return;
 
 	if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(GetAvatarActorFromActorInfo()))
 	{
 		const FVector SocketLocation = CombatInterface->GetCombatSocketLocation();
+		FRotator Rotation = (ProjectileTargetLocation - SocketLocation).Rotation();
+		Rotation.Pitch = 0.f;
 
 		FTransform SpawnTransform;
 		SpawnTransform.SetLocation(SocketLocation);
-		// TODO: Set the Projectile Rotation
+		SpawnTransform.SetRotation(Rotation.Quaternion());
 		
 		// We're not going to use the basic SpawnActor here because SpawnActorDeferred handles stuffs a little different.
 		// Once the actor is finished spawning, all properties are already set
