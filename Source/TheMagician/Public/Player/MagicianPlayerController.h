@@ -48,11 +48,18 @@ private:
 	TObjectPtr<UInputAction> MoveAction;
 
 	UPROPERTY(EditAnywhere, Category = Input)
+	TObjectPtr<UInputAction> ShiftAction;
+
+	UPROPERTY(EditAnywhere, Category = Input)
 	TObjectPtr<UInputAction> MoveCameraAction;
 
 	/* Callbacks for Input */
 	void Move(const FInputActionValue& InputActionValue);
+	FORCEINLINE void ShiftPressed() { bShiftKeyDown = true; };
+	FORCEINLINE void ShiftReleased() { bShiftKeyDown = false; };;
 	void MoveCamera(const FInputActionValue& InputActionValue);
+
+	bool bShiftKeyDown = false;
 
 	FHitResult CursorHit;
 	void CursorTrace();
