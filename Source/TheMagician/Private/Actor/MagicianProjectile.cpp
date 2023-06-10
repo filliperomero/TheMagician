@@ -3,8 +3,11 @@
 
 #include "Actor/MagicianProjectile.h"
 
+#include "NiagaraFunctionLibrary.h"
+#include "Components/AudioComponent.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 AMagicianProjectile::AMagicianProjectile()
 {
@@ -29,10 +32,41 @@ void AMagicianProjectile::BeginPlay()
 {
 	Super::BeginPlay();
 
+	SetLifeSpan(LifeSpan);
+
 	Sphere->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnSphereOverlap);
+
+	if (LoopingSound)
+		LoopingSoundComponent = UGameplayStatics::SpawnSoundAttached(LoopingSound, GetRootComponent());
+}
+
+void AMagicianProjectile::Destroyed()
+{
+	// There is a chance where destroyed is replicated before OnSphereOverlap, so we're making sure the client will be able to apply the effects
+	if (!bHit && !HasAuthority())
+	{
+		if (ImpactSound)
+			UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), FRotator::ZeroRotator);
+
+		if (ImpactEffect)
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect, GetActorLocation());
+
+		if (LoopingSoundComponent) LoopingSoundComponent->Stop();
+	}
+	Super::Destroyed();
 }
 
 void AMagicianProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+                                          UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	if (ImpactSound)
+		UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), FRotator::ZeroRotator);
+
+	if (ImpactEffect)
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect, GetActorLocation());
+
+	if (LoopingSoundComponent) LoopingSoundComponent->Stop();
+
+	if (HasAuthority()) Destroy();
+	else bHit = true;
 }

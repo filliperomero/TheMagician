@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "MagicianProjectile.generated.h"
 
+class UNiagaraSystem;
 class UProjectileMovementComponent;
 class USphereComponent;
 
@@ -22,14 +23,30 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void Destroyed() override;
 
 	UFUNCTION()
 	void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 private:
+	bool bHit = false;
+
+	UPROPERTY(EditDefaultsOnly)
+	float LifeSpan = 15.f;
+	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USphereComponent> Sphere;
 
-public:	
+	UPROPERTY(EditAnywhere, Category = VFX)
+	TObjectPtr<UNiagaraSystem> ImpactEffect;
 
+	UPROPERTY(EditAnywhere, Category = SFX)
+	TObjectPtr<USoundBase> ImpactSound;
+
+	UPROPERTY()
+	TObjectPtr<UAudioComponent> LoopingSoundComponent;
+	
+	UPROPERTY(EditAnywhere, Category = SFX)
+	TObjectPtr<USoundBase> LoopingSound;
+	
 };
