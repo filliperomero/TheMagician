@@ -54,9 +54,14 @@ void AMagicianProjectile::Destroyed()
 
 		if (ImpactEffect)
 			UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect, GetActorLocation());
-
-		if (LoopingSoundComponent) LoopingSoundComponent->Stop();
 	}
+	
+	if (LoopingSoundComponent)
+	{
+		LoopingSoundComponent->Stop();
+		LoopingSoundComponent->DestroyComponent();
+	}
+	
 	Super::Destroyed();
 }
 
@@ -69,7 +74,11 @@ void AMagicianProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedCompone
 	if (ImpactEffect)
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect, GetActorLocation());
 
-	if (LoopingSoundComponent) LoopingSoundComponent->Stop();
+	if (LoopingSoundComponent)
+	{
+		LoopingSoundComponent->Stop();
+		LoopingSoundComponent->DestroyComponent();
+	}
 
 	if (HasAuthority())
 	{
