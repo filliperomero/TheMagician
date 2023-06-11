@@ -3,6 +3,8 @@
 
 #include "Actor/MagicianProjectile.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystemComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Components/AudioComponent.h"
 #include "Components/SphereComponent.h"
@@ -69,6 +71,14 @@ void AMagicianProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedCompone
 
 	if (LoopingSoundComponent) LoopingSoundComponent->Stop();
 
-	if (HasAuthority()) Destroy();
+	if (HasAuthority())
+	{
+		if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor))
+		{
+			TargetASC->ApplyGameplayEffectSpecToSelf(*DamageEffectSpecHandle.Data.Get());
+		}
+		
+		Destroy();
+	}
 	else bHit = true;
 }
