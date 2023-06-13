@@ -4,6 +4,7 @@
 #include "Character/Enemy.h"
 
 #include "AbilitySystem/MagicianAbilitySystemComponent.h"
+#include "AbilitySystem/MagicianAbilitySystemLibrary.h"
 #include "AbilitySystem/MagicianAttributeSet.h"
 #include "Components/WidgetComponent.h"
 #include "TheMagician/TheMagician.h"
@@ -82,4 +83,9 @@ void AEnemy::InitAbilityActorInfo()
 	Cast<UMagicianAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();
 
 	InitializeDefaultAttributes();
+}
+
+void AEnemy::InitializeDefaultAttributes() const
+{
+	UMagicianAbilitySystemLibrary::InitializeDefaultAttributes(this, CharacterClass, Level, AbilitySystemComponent);
 }
