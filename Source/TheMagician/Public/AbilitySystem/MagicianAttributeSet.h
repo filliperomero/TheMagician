@@ -140,6 +140,12 @@ public:
 	ATTRIBUTE_ACCESSORS(UMagicianAttributeSet, Mana);
 	/** End Vital Attributes */
 
+	/** Meta Attributes */
+	UPROPERTY(BlueprintReadOnly, Category = "Meta Attributes")
+	FGameplayAttributeData IncomingDamage;
+	ATTRIBUTE_ACCESSORS(UMagicianAttributeSet, IncomingDamage);
+	/** End Meta Attributes */
+
 	UFUNCTION()
 	void OnRep_Health(const FGameplayAttributeData& OldHealth) const;
 
