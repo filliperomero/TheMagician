@@ -42,6 +42,9 @@ public:
 	FGameplayTag InputTag_2;
 	FGameplayTag InputTag_3;
 	FGameplayTag InputTag_4;
+
+	/** Ability Tags */
+	FGameplayTag Damage;
 	
 private:
 	static FMagicianGameplayTags GameplayTags;

@@ -5,6 +5,7 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
+#include "MagicianGameplayTags.h"
 #include "Actor/MagicianProjectile.h"
 #include "Interaction/CombatInterface.h"
 
@@ -41,6 +42,10 @@ void UMagicianProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLo
 		
 		const UAbilitySystemComponent* SourceASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetAvatarActorFromActorInfo());
 		const FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), SourceASC->MakeEffectContext());
+
+		// Make use of Set By Caller Magnitude to set the Damage using a specific GameplayTag
+		const FMagicianGameplayTags GameplayTags = FMagicianGameplayTags::Get();
+		UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.Damage, Damage.GetValueAtLevel(GetAbilityLevel()));
 		Projectile->DamageEffectSpecHandle = SpecHandle;
 
 		Projectile->FinishSpawning(SpawnTransform);
