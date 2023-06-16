@@ -121,7 +121,15 @@ void UMagicianAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCa
 			const float NewHealth = GetHealth() - LocalIncomingDamage;
 			SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
 
-			const bool bIsFatal = NewHealth <= 0.f; // Do something when is Fatal
+			const bool bIsFatal = NewHealth <= 0.f;
+
+			if (!bIsFatal)
+			{
+				FGameplayTagContainer TagContainer;
+				TagContainer.AddTag(FMagicianGameplayTags::Get().Effects_HitReact);
+				
+				Props.TargetASC->TryActivateAbilitiesByTag(TagContainer);
+			}
 		}
 	}
 }

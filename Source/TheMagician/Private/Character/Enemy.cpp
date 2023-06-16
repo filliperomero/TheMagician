@@ -9,6 +9,8 @@
 #include "Components/WidgetComponent.h"
 #include "TheMagician/TheMagician.h"
 #include "UI/Widget/MagicianUserWidget.h"
+#include "MagicianGameplayTags.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 AEnemy::AEnemy()
 {
@@ -47,7 +49,9 @@ int32 AEnemy::GetPlayerLevel()
 void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
+	GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
 	InitAbilityActorInfo();
+	UMagicianAbilitySystemLibrary::GiveStartupAbilities(this, AbilitySystemComponent);
 
 	if (UMagicianUserWidget* MagicianUserWidget = Cast<UMagicianUserWidget>(HealthBar->GetUserWidgetObject()))
 	{
@@ -71,9 +75,21 @@ void AEnemy::BeginPlay()
 		}
 	);
 
+	// Bind to GameplayTagEvent where if Effects_HitReact GameplayTag is removed or added, we'll call the callback function
+	AbilitySystemComponent->RegisterGameplayTagEvent(FMagicianGameplayTags::Get().Effects_HitReact, EGameplayTagEventType::NewOrRemoved).AddUObject(
+		this,
+		&ThisClass::HitReactTagChanged
+	);
+
 	// Broadcast Initial Values
 	OnHealthChanged.Broadcast(MagicianAS->GetHealth());
 	OnMaxHealthChanged.Broadcast(MagicianAS->GetMaxHealth());
+}
+
+void AEnemy::HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
+{
+	bHitReacting = NewCount > 0;
+	GetCharacterMovement()->MaxWalkSpeed = bHitReacting ? 0.f : BaseWalkSpeed;
 }
 
 void AEnemy::InitAbilityActorInfo()

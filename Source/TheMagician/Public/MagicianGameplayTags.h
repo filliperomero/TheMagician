@@ -45,6 +45,9 @@ public:
 
 	/** Ability Tags */
 	FGameplayTag Damage;
+
+	/** Effects */
+	FGameplayTag Effects_HitReact;
 	
 private:
 	static FMagicianGameplayTags GameplayTags;
