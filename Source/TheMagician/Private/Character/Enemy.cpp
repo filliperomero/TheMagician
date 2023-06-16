@@ -29,6 +29,12 @@ AEnemy::AEnemy()
 	Weapon->SetCustomDepthStencilValue(CUSTOM_DEPTH_RED);
 }
 
+void AEnemy::Die()
+{
+	SetLifeSpan(LifeSpan);
+	Super::Die();
+}
+
 void AEnemy::HighlightActor()
 {
 	GetMesh()->SetRenderCustomDepth(true);

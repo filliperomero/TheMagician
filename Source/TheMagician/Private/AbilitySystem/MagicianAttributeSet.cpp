@@ -6,6 +6,7 @@
 #include "GameplayEffectExtension.h"
 #include "MagicianGameplayTags.h"
 #include "GameFramework/Character.h"
+#include "Interaction/CombatInterface.h"
 #include "Net/UnrealNetwork.h"
 
 UMagicianAttributeSet::UMagicianAttributeSet()
@@ -123,7 +124,14 @@ void UMagicianAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCa
 
 			const bool bIsFatal = NewHealth <= 0.f;
 
-			if (!bIsFatal)
+			if (bIsFatal)
+			{
+				if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(Props.TargetAvatarActor))
+				{
+					CombatInterface->Die();
+				}
+			}
+			else
 			{
 				FGameplayTagContainer TagContainer;
 				TagContainer.AddTag(FMagicianGameplayTags::Get().Effects_HitReact);

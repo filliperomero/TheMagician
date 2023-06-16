@@ -21,6 +21,8 @@ class THEMAGICIAN_API AEnemy : public ABaseCharacter, public IEnemyInterface
 public:
 	AEnemy();
 
+	virtual void Die() override;
+
 	/** Begin Enemy Interface */
 	virtual void HighlightActor() override;
 	virtual void UnHighlightActor() override;
@@ -43,6 +45,9 @@ public:
 	bool bHitReacting { false };
 	
 	void HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Combat)
+	float LifeSpan { 5.f };
 
 protected:
 	virtual void BeginPlay() override;
