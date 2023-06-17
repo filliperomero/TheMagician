@@ -7,6 +7,7 @@
 #include "GameplayTagContainer.h"
 #include "MagicianPlayerController.generated.h"
 
+class UDamageTextComponent;
 class UMagicianAbilitySystemComponent;
 class UMagicianInputConfig;
 class UInputMappingContext;
@@ -26,6 +27,9 @@ class THEMAGICIAN_API AMagicianPlayerController : public APlayerController
 public:
 	AMagicianPlayerController();
 	virtual void PlayerTick(float DeltaTime) override;
+
+	UFUNCTION(Client, Reliable)
+	void ShowDamageNumber(float DamageAmount, ACharacter* TargetCharacter);
 
 protected:
 	virtual void BeginPlay() override;
@@ -87,5 +91,8 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USplineComponent> Spline;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UDamageTextComponent> DamageTextComponentClas;
 	
 };

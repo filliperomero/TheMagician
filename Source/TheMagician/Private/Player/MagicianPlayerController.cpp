@@ -14,6 +14,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Input/MagicianInputComponent.h"
 #include "Interaction/EnemyInterface.h"
+#include "UI/Widget/DamageTextComponent.h"
 
 AMagicianPlayerController::AMagicianPlayerController()
 {
@@ -28,6 +29,20 @@ void AMagicianPlayerController::PlayerTick(float DeltaTime)
 
 	CursorTrace();
 	if (bAutoRunning) AutoRun();
+}
+
+void AMagicianPlayerController::ShowDamageNumber_Implementation(float DamageAmount, ACharacter* TargetCharacter)
+{
+	if (!IsValid(TargetCharacter) || !DamageTextComponentClas) return;
+
+	UDamageTextComponent* DamageTextComponent = NewObject<UDamageTextComponent>(TargetCharacter, DamageTextComponentClas);
+	// Since we're creating one dynamic, we need to register it
+	DamageTextComponent->RegisterComponent();
+	// We're attaching it so we start off in the correct Location
+	DamageTextComponent->AttachToComponent(TargetCharacter->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+	// Since we just wanted the start location and we want the animation to just happen, we are detaching.
+	DamageTextComponent->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+	DamageTextComponent->SetDamageText(DamageAmount);
 }
 
 void AMagicianPlayerController::AutoRun()

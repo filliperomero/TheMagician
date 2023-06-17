@@ -7,7 +7,9 @@
 #include "MagicianGameplayTags.h"
 #include "GameFramework/Character.h"
 #include "Interaction/CombatInterface.h"
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
+#include "Player/MagicianPlayerController.h"
 
 UMagicianAttributeSet::UMagicianAttributeSet()
 {
@@ -138,7 +140,20 @@ void UMagicianAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCa
 				
 				Props.TargetASC->TryActivateAbilitiesByTag(TagContainer);
 			}
+
+			ShowFloatingText(Props, LocalIncomingDamage);
 		}
+	}
+}
+
+void UMagicianAttributeSet::ShowFloatingText(const FEffectProperties& Props, const float Damage) const
+{
+	// We don't want to show damage to itself
+	if (Props.SourceCharacter == Props.TargetCharacter) return;
+
+	if (AMagicianPlayerController* PC = Cast<AMagicianPlayerController>(UGameplayStatics::GetPlayerController(Props.SourceCharacter, 0)))
+	{
+		PC->ShowDamageNumber(Damage, Props.TargetCharacter);
 	}
 }
 
