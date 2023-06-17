@@ -10,12 +10,16 @@
 struct MagicianDamageStatics
 {
 	DECLARE_ATTRIBUTE_CAPTUREDEF(Armor);
+	DECLARE_ATTRIBUTE_CAPTUREDEF(ArmorPenetration);
 	DECLARE_ATTRIBUTE_CAPTUREDEF(BlockChance);	
 	
 	MagicianDamageStatics()
 	{
+		// Target
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UMagicianAttributeSet, Armor, Target, false);
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UMagicianAttributeSet, BlockChance, Target, false);
+		// Source
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UMagicianAttributeSet, ArmorPenetration, Source, false);
 	}
 };
 
@@ -29,6 +33,7 @@ static const MagicianDamageStatics& DamageStatics()
 UExecCalc_Damage::UExecCalc_Damage()
 {
 	RelevantAttributesToCapture.Add(DamageStatics().ArmorDef);
+	RelevantAttributesToCapture.Add(DamageStatics().ArmorPenetrationDef);
 	RelevantAttributesToCapture.Add(DamageStatics().BlockChanceDef);
 }
 
@@ -55,13 +60,25 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	float Damage = Spec.GetSetByCallerMagnitude(FMagicianGameplayTags::Get().Damage);
 
 	// Capture BlockChance on Target, and determine if there was a successful Block
-	// if Blocked, halve the damage
 	float TargetBlockChance = 0.f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().BlockChanceDef, EvaluationParameters, TargetBlockChance);
 	TargetBlockChance = FMath::Max<float>(TargetBlockChance, 0.f);
 
 	const bool bDamageBlocked = FMath::RandRange(1, 100) < TargetBlockChance;
+	// if Blocked, halve the damage
 	Damage = bDamageBlocked ? Damage / 2.f : Damage;
+
+	// ArmorPenetration ignores a percentage of the Target's Armor
+	float TargetArmor = 0.f;
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().ArmorDef, EvaluationParameters, TargetArmor);
+	TargetArmor = FMath::Max<float>(TargetArmor, 0.f);
+
+	float SourceArmorPenetration = 0.f;
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().ArmorPenetrationDef, EvaluationParameters, SourceArmorPenetration);
+	SourceArmorPenetration = FMath::Max<float>(SourceArmorPenetration, 0.f);
+
+	const float EffectiveArmor = TargetArmor *= (100 - SourceArmorPenetration) / 100.f; // TODO: Make sure SourceArmorPenetration is not higher than 100
+	Damage *= ( 100 - EffectiveArmor * 0.33f) / 100.f; // TODO: Make sure EffectiveArmor is not higher than 100
 
 	const FGameplayModifierEvaluatedData EvaluatedData(UMagicianAttributeSet::GetIncomingDamageAttribute(), EGameplayModOp::Additive, Damage);
 	OutExecutionOutput.AddOutputModifier(EvaluatedData);
