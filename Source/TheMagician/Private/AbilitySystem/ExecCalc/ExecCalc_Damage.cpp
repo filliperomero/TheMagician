@@ -77,7 +77,7 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().ArmorPenetrationDef, EvaluationParameters, SourceArmorPenetration);
 	SourceArmorPenetration = FMath::Max<float>(SourceArmorPenetration, 0.f);
 
-	const float EffectiveArmor = TargetArmor *= (100 - SourceArmorPenetration) / 100.f; // TODO: Make sure SourceArmorPenetration is not higher than 100
+	const float EffectiveArmor = TargetArmor * (100 - SourceArmorPenetration) / 100.f; // TODO: Make sure SourceArmorPenetration is not higher than 100
 	Damage *= ( 100 - EffectiveArmor * 0.33f) / 100.f; // TODO: Make sure EffectiveArmor is not higher than 100
 
 	const FGameplayModifierEvaluatedData EvaluatedData(UMagicianAttributeSet::GetIncomingDamageAttribute(), EGameplayModOp::Additive, Damage);
