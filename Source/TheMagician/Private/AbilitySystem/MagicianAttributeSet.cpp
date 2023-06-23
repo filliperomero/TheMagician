@@ -5,6 +5,7 @@
 #include "AbilitySystemComponent.h"
 #include "GameplayEffectExtension.h"
 #include "MagicianGameplayTags.h"
+#include "AbilitySystem/MagicianAbilitySystemLibrary.h"
 #include "GameFramework/Character.h"
 #include "Interaction/CombatInterface.h"
 #include "Kismet/GameplayStatics.h"
@@ -140,20 +141,22 @@ void UMagicianAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCa
 				
 				Props.TargetASC->TryActivateAbilitiesByTag(TagContainer);
 			}
-
-			ShowFloatingText(Props, LocalIncomingDamage);
+			
+			const bool bBlock = UMagicianAbilitySystemLibrary::IsBlockedHit(Props.EffectContextHandle);
+			const bool bCriticalHit = UMagicianAbilitySystemLibrary::IsCriticalHit(Props.EffectContextHandle);
+			ShowFloatingText(Props, LocalIncomingDamage, bBlock, bCriticalHit);
 		}
 	}
 }
 
-void UMagicianAttributeSet::ShowFloatingText(const FEffectProperties& Props, const float Damage) const
+void UMagicianAttributeSet::ShowFloatingText(const FEffectProperties& Props, const float Damage, const bool bBlockedHit, const bool bCriticalHit) const
 {
 	// We don't want to show damage to itself
 	if (Props.SourceCharacter == Props.TargetCharacter) return;
 
 	if (AMagicianPlayerController* PC = Cast<AMagicianPlayerController>(UGameplayStatics::GetPlayerController(Props.SourceCharacter, 0)))
 	{
-		PC->ShowDamageNumber(Damage, Props.TargetCharacter);
+		PC->ShowDamageNumber(Damage, Props.TargetCharacter, bBlockedHit, bCriticalHit);
 	}
 }
 

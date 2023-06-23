@@ -31,7 +31,7 @@ void AMagicianPlayerController::PlayerTick(float DeltaTime)
 	if (bAutoRunning) AutoRun();
 }
 
-void AMagicianPlayerController::ShowDamageNumber_Implementation(float DamageAmount, ACharacter* TargetCharacter)
+void AMagicianPlayerController::ShowDamageNumber_Implementation(float DamageAmount, ACharacter* TargetCharacter, bool bBlockedHit, bool bCriticalHit)
 {
 	if (!IsValid(TargetCharacter) || !DamageTextComponentClas) return;
 
@@ -42,7 +42,7 @@ void AMagicianPlayerController::ShowDamageNumber_Implementation(float DamageAmou
 	DamageTextComponent->AttachToComponent(TargetCharacter->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
 	// Since we just wanted the start location and we want the animation to just happen, we are detaching.
 	DamageTextComponent->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
-	DamageTextComponent->SetDamageText(DamageAmount);
+	DamageTextComponent->SetDamageText(DamageAmount, bBlockedHit, bCriticalHit);
 }
 
 void AMagicianPlayerController::AutoRun()
