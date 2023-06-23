@@ -4,6 +4,7 @@
 #include "AbilitySystem/MagicianAbilitySystemLibrary.h"
 
 #include "AbilitySystemComponent.h"
+#include "MagicianAbilityTypes.h"
 #include "Game/MagicianGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/MagicianPlayerState.h"
@@ -93,4 +94,32 @@ UCharacterClassInfo* UMagicianAbilitySystemLibrary::GetCharacterClassInfo(const 
 	if (MagicianGameMode == nullptr) return nullptr;
 
 	return MagicianGameMode->CharacterClassInfo;
+}
+
+bool UMagicianAbilitySystemLibrary::IsBlockedHit(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FMagicianGameplayEffectContext* MagicianContext = static_cast<const FMagicianGameplayEffectContext*>(EffectContextHandle.Get()))
+		return MagicianContext->IsBlockedHit();
+
+	return false;
+}
+
+void UMagicianAbilitySystemLibrary::SetIsBlockedHit(FGameplayEffectContextHandle& EffectContextHandle, bool bInIsBlockedHit)
+{
+	if (FMagicianGameplayEffectContext* MagicianContext = static_cast<FMagicianGameplayEffectContext*>(EffectContextHandle.Get()))
+		MagicianContext->SetIsBlockedHit(bInIsBlockedHit);
+}
+
+bool UMagicianAbilitySystemLibrary::IsCriticalHit(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FMagicianGameplayEffectContext* MagicianContext = static_cast<const FMagicianGameplayEffectContext*>(EffectContextHandle.Get()))
+		return MagicianContext->IsCriticalHit();
+
+	return false;
+}
+
+void UMagicianAbilitySystemLibrary::SetIsCriticalHit(FGameplayEffectContextHandle& EffectContextHandle, bool bInIsCriticalHit)
+{
+	if (FMagicianGameplayEffectContext* MagicianContext = static_cast<FMagicianGameplayEffectContext*>(EffectContextHandle.Get()))
+		MagicianContext->SetIsCriticalHit(bInIsCriticalHit);
 }
