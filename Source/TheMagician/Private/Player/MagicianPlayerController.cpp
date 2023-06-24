@@ -33,7 +33,7 @@ void AMagicianPlayerController::PlayerTick(float DeltaTime)
 
 void AMagicianPlayerController::ShowDamageNumber_Implementation(float DamageAmount, ACharacter* TargetCharacter, bool bBlockedHit, bool bCriticalHit)
 {
-	if (!IsValid(TargetCharacter) || !DamageTextComponentClas) return;
+	if (!IsValid(TargetCharacter) || !DamageTextComponentClas || !IsLocalController()) return;
 
 	UDamageTextComponent* DamageTextComponent = NewObject<UDamageTextComponent>(TargetCharacter, DamageTextComponentClas);
 	// Since we're creating one dynamic, we need to register it

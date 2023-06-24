@@ -68,18 +68,23 @@ void AMagicianProjectile::Destroyed()
 void AMagicianProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
                                           UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (ImpactSound)
-		UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), FRotator::ZeroRotator);
+	if (DamageEffectSpecHandle.Data.IsValid() && DamageEffectSpecHandle.Data.Get()->GetContext().GetEffectCauser() == OtherActor) return;
 
-	if (ImpactEffect)
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect, GetActorLocation());
-
-	if (LoopingSoundComponent)
+	if (!bHit)
 	{
-		LoopingSoundComponent->Stop();
-		LoopingSoundComponent->DestroyComponent();
-	}
+		if (ImpactSound)
+			UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), FRotator::ZeroRotator);
 
+		if (ImpactEffect)
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect, GetActorLocation());
+
+		if (LoopingSoundComponent)
+		{
+			LoopingSoundComponent->Stop();
+			LoopingSoundComponent->DestroyComponent();
+		}
+	}
+	
 	if (HasAuthority())
 	{
 		if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor))

@@ -166,7 +166,7 @@ void UMagicianAttributeSet::ShowFloatingText(const FEffectProperties& Props, con
 	// We don't want to show damage to itself
 	if (Props.SourceCharacter == Props.TargetCharacter) return;
 
-	if (AMagicianPlayerController* PC = Cast<AMagicianPlayerController>(UGameplayStatics::GetPlayerController(Props.SourceCharacter, 0)))
+	if (AMagicianPlayerController* PC = Cast<AMagicianPlayerController>(Props.SourceCharacter->Controller))
 	{
 		PC->ShowDamageNumber(Damage, Props.TargetCharacter, bBlockedHit, bCriticalHit);
 	}

@@ -57,7 +57,8 @@ void AEnemy::BeginPlay()
 	Super::BeginPlay();
 	GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
 	InitAbilityActorInfo();
-	UMagicianAbilitySystemLibrary::GiveStartupAbilities(this, AbilitySystemComponent);
+	if (HasAuthority())
+		UMagicianAbilitySystemLibrary::GiveStartupAbilities(this, AbilitySystemComponent);
 
 	if (UMagicianUserWidget* MagicianUserWidget = Cast<UMagicianUserWidget>(HealthBar->GetUserWidgetObject()))
 	{
@@ -104,7 +105,7 @@ void AEnemy::InitAbilityActorInfo()
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	Cast<UMagicianAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();
 
-	InitializeDefaultAttributes();
+	if (HasAuthority())	InitializeDefaultAttributes();
 }
 
 void AEnemy::InitializeDefaultAttributes() const
