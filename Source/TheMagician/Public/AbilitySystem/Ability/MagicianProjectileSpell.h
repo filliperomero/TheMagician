@@ -3,13 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AbilitySystem/Ability/MagicianGameplayAbility.h"
+#include "MagicianDamageGameplayAbility.h"
 #include "MagicianProjectileSpell.generated.h"
 
 class AMagicianProjectile;
 
 UCLASS()
-class THEMAGICIAN_API UMagicianProjectileSpell : public UMagicianGameplayAbility
+class THEMAGICIAN_API UMagicianProjectileSpell : public UMagicianDamageGameplayAbility
 {
 	GENERATED_BODY()
 
@@ -23,8 +23,5 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TSubclassOf<AMagicianProjectile> ProjectileClass;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TSubclassOf<UGameplayEffect> DamageEffectClass;
 	
 };

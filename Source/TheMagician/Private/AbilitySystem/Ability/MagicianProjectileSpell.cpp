@@ -56,7 +56,14 @@ void UMagicianProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLo
 
 		// Make use of Set By Caller Magnitude to set the Damage using a specific GameplayTag
 		const FMagicianGameplayTags GameplayTags = FMagicianGameplayTags::Get();
-		UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.Damage, Damage.GetValueAtLevel(GetAbilityLevel()));
+
+		// Add Damages by Damage Type
+		for (auto& Pair : DamageTypes)
+		{
+			const float ScaledDamage = Pair.Value.GetValueAtLevel(GetAbilityLevel());
+			UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, Pair.Key, ScaledDamage);
+		}
+		
 		Projectile->DamageEffectSpecHandle = SpecHandle;
 
 		Projectile->FinishSpawning(SpawnTransform);
