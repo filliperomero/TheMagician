@@ -75,9 +75,9 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 
 	// Get Damage Set by Caller Magnitude (get all Damage Types)
 	float Damage = 0.f;
-	for (FGameplayTag DamageTypeTag : FMagicianGameplayTags::Get().DamageTypes)
+	for (const TTuple<FGameplayTag, FGameplayTag>& Pair : FMagicianGameplayTags::Get().DamageTypesToResistances)
 	{
-		Damage += Spec.GetSetByCallerMagnitude(DamageTypeTag);
+		Damage += Spec.GetSetByCallerMagnitude(Pair.Key);
 	}
 
 	// Capture BlockChance on Target, and determine if there was a successful Block
