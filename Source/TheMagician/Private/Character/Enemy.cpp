@@ -47,6 +47,8 @@ void AEnemy::PossessedBy(AController* NewController)
 
 	MagicianAIController->GetBlackboardComponent()->InitializeBlackboard(*BehaviorTree->BlackboardAsset);
 	MagicianAIController->RunBehaviorTree(BehaviorTree);
+	MagicianAIController->GetBlackboardComponent()->SetValueAsBool(FName("HitReacting"), false);
+	MagicianAIController->GetBlackboardComponent()->SetValueAsBool(FName("RangedAttacker"), CharacterClass != ECharacterClass::Warrior);
 }
 
 void AEnemy::Die()
@@ -117,6 +119,7 @@ void AEnemy::HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
 {
 	bHitReacting = NewCount > 0;
 	GetCharacterMovement()->MaxWalkSpeed = bHitReacting ? 0.f : BaseWalkSpeed;
+	MagicianAIController->GetBlackboardComponent()->SetValueAsBool(FName("HitReacting"), bHitReacting);
 }
 
 void AEnemy::InitAbilityActorInfo()
