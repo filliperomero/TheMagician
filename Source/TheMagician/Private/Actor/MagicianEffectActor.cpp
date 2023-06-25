@@ -19,6 +19,8 @@ void AMagicianEffectActor::BeginPlay()
 
 void AMagicianEffectActor::ApplyEffectsToTarget(AActor* TargetActor, TArray<FGameplayEffectBase> GameplayEffects)
 {
+	if (TargetActor->ActorHasTag(FName("Enemy")) && !bApplyEffectsToEnemies) return;
+	
 	// Avoid the need to cast to IAbilitySystemInterface and checking it, then getting the AbilitySystem from it
 	UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
 	
@@ -47,10 +49,14 @@ void AMagicianEffectActor::ApplyEffect(UAbilitySystemComponent* TargetActorASC, 
 
 	if (bIsInfinite && GameplayEffect.EffectRemovalPolicy == EEffectRemovalPolicy::RemoveOnEndOverlap)
 		ActiveEffectHandles.Add(ActiveEffectHandle, TargetActorASC);
+
+	if (bDestroyOnEffectApplication) Destroy();
 }
 
 void AMagicianEffectActor::RemoveEffectFromTarget(AActor* TargetActor)
 {
+	if (TargetActor->ActorHasTag(FName("Enemy")) && !bApplyEffectsToEnemies) return;
+	
 	UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
 	
 	if (!IsValid(TargetASC)) return;
@@ -74,6 +80,8 @@ void AMagicianEffectActor::RemoveEffectFromTarget(AActor* TargetActor)
 
 void AMagicianEffectActor::OnOverlap(AActor* TargetActor)
 {
+	if (TargetActor->ActorHasTag(FName("Enemy")) && !bApplyEffectsToEnemies) return;
+	
 	UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
 
 	for (const auto GameplayEffect : GameplayEffectList)
@@ -85,6 +93,8 @@ void AMagicianEffectActor::OnOverlap(AActor* TargetActor)
 
 void AMagicianEffectActor::OnEndOverlap(AActor* TargetActor)
 {
+	if (TargetActor->ActorHasTag(FName("Enemy")) && !bApplyEffectsToEnemies) return;
+	
 	UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
 	
 	for (const auto GameplayEffect : GameplayEffectList)

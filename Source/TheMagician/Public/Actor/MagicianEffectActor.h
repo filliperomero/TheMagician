@@ -65,6 +65,15 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void OnEndOverlap(AActor* TargetActor);
 
+	/** Destroy Actor after applying Effect.
+	 * Be careful since if an Infinite Effect is applied and we have a RemoveOnEndOverlap Removal Policy, the effect will never be removed
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Applied Effects")
+	bool bDestroyOnEffectApplication { false };
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Applied Effects")
+	bool bApplyEffectsToEnemies { false };
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Applied Effects")
 	TArray<FGameplayEffectBase> GameplayEffectList;
 	
