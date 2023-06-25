@@ -9,6 +9,8 @@
 #include "AbilitySystem/Data/CharacterClassInfo.h"
 #include "Enemy.generated.h"
 
+class AMagicianAIController;
+class UBehaviorTree;
 class UWidgetComponent;
 /**
  * 
@@ -20,6 +22,7 @@ class THEMAGICIAN_API AEnemy : public ABaseCharacter, public IEnemyInterface
 
 public:
 	AEnemy();
+	virtual void PossessedBy(AController* NewController) override;
 
 	virtual void Die() override;
 
@@ -62,4 +65,10 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UWidgetComponent> HealthBar;
+
+	UPROPERTY(EditAnywhere, Category = AI)
+	TObjectPtr<UBehaviorTree> BehaviorTree;
+
+	UPROPERTY()
+	TObjectPtr<AMagicianAIController> MagicianAIController;
 };

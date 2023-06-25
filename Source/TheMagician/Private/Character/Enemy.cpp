@@ -10,6 +10,9 @@
 #include "TheMagician/TheMagician.h"
 #include "UI/Widget/MagicianUserWidget.h"
 #include "MagicianGameplayTags.h"
+#include "AI/MagicianAIController.h"
+#include "BehaviorTree/BehaviorTree.h"
+#include "BehaviorTree/BlackboardComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 AEnemy::AEnemy()
@@ -27,6 +30,18 @@ AEnemy::AEnemy()
 	
 	GetMesh()->SetCustomDepthStencilValue(CUSTOM_DEPTH_RED);
 	Weapon->SetCustomDepthStencilValue(CUSTOM_DEPTH_RED);
+}
+
+void AEnemy::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	// AI only matters on the Server. Everything should be replicated for us
+	if (!HasAuthority()) return;
+	MagicianAIController = Cast<AMagicianAIController>(NewController);
+
+	MagicianAIController->GetBlackboardComponent()->InitializeBlackboard(*BehaviorTree->BlackboardAsset);
+	MagicianAIController->RunBehaviorTree(BehaviorTree);
 }
 
 void AEnemy::Die()
