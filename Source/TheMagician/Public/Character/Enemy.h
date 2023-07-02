@@ -43,7 +43,7 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnAttributeChangedSignature OnMaxHealthChanged;
 
-	UPROPERTY(BlueprintReadOnly, Category = Combat)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Combat)
 	float BaseWalkSpeed { 250.f };
 	
 	UPROPERTY(BlueprintReadOnly, Category = Combat)

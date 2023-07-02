@@ -2,6 +2,7 @@
 
 #include "Character/BaseCharacter.h"
 #include "AbilitySystemComponent.h"
+#include "MagicianGameplayTags.h"
 #include "AbilitySystem/MagicianAbilitySystemComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "TheMagician/TheMagician.h"
@@ -96,10 +97,20 @@ void ABaseCharacter::AddCharacterAbilities()
 	MagicianASC->AddCharacterAbilities(StartupAbilities);
 }
 
-FVector ABaseCharacter::GetCombatSocketLocation_Implementation()
+FVector ABaseCharacter::GetCombatSocketLocation_Implementation(const FGameplayTag& MontageTag)
 {
-	check(Weapon);
-	return Weapon->GetSocketLocation(WeaponTipSocketName);
+	const FMagicianGameplayTags& GameplayTags = FMagicianGameplayTags::Get();
+	
+	if (IsValid(Weapon) && MontageTag.MatchesTagExact(GameplayTags.Montage_Attack_Weapon))
+		return Weapon->GetSocketLocation(WeaponTipSocketName);
+
+	if (MontageTag.MatchesTagExact(GameplayTags.Montage_Attack_LeftHand))
+		return GetMesh()->GetSocketLocation(LeftHandSocketName);
+
+	if (MontageTag.MatchesTagExact(GameplayTags.Montage_Attack_RightHand))
+		return GetMesh()->GetSocketLocation(RightHandSocketName);
+
+	return FVector();
 }
 
 bool ABaseCharacter::IsDead_Implementation() const
@@ -110,6 +121,11 @@ bool ABaseCharacter::IsDead_Implementation() const
 AActor* ABaseCharacter::GetAvatar_Implementation()
 {
 	return this;
+}
+
+TArray<FTaggedMontage> ABaseCharacter::GetAttackMontages_Implementation()
+{
+	return AttackMontages;
 }
 
 void ABaseCharacter::Dissolve()
