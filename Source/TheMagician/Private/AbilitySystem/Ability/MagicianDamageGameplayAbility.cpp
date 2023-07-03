@@ -19,3 +19,12 @@ void UMagicianDamageGameplayAbility::CauseDamage(AActor* TargetActor)
 
 	GetAbilitySystemComponentFromActorInfo()->ApplyGameplayEffectSpecToTarget(*DamageSpecHandle.Data.Get(), UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor));
 }
+
+FTaggedMontage UMagicianDamageGameplayAbility::GetRandomTaggedMontageFromArray(const TArray<FTaggedMontage>& TaggedMontages) const
+{
+	if (TaggedMontages.Num() == 0) return FTaggedMontage();
+
+	const int32 Selection = FMath::RandRange(0, TaggedMontages.Num() - 1);
+
+	return TaggedMontages[Selection];
+}
