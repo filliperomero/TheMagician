@@ -31,7 +31,7 @@ protected:
 private:
 	
 	UPROPERTY(EditAnywhere, Category = Camera)
-	float MaxCameraBoomDistance = 750.f;
+	float MaxCameraBoomDistance = 1200.f; // Go back to 750.f later
 	
 	UPROPERTY(EditAnywhere, Category = Camera)
 	float MinCameraBoomDistance = 300.f;
