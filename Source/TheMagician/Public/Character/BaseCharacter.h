@@ -45,7 +45,7 @@ protected:
 	virtual void InitializeDefaultAttributes() const;
 	void AddCharacterAbilities();
 
-	UPROPERTY(EditAnywhere, Category = Combat)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Combat)
 	TObjectPtr<USkeletalMeshComponent> Weapon;
 
 	UPROPERTY(EditAnywhere, Category = Combat)
