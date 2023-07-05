@@ -54,6 +54,7 @@ void AEnemy::PossessedBy(AController* NewController)
 void AEnemy::Die()
 {
 	SetLifeSpan(LifeSpan);
+	if (MagicianAIController) MagicianAIController->GetBlackboardComponent()->SetValueAsBool(FName("Dead"), true);
 	Super::Die();
 }
 
