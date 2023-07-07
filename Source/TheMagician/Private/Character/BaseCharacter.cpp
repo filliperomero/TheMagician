@@ -5,6 +5,7 @@
 #include "MagicianGameplayTags.h"
 #include "AbilitySystem/MagicianAbilitySystemComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "TheMagician/TheMagician.h"
 
 ABaseCharacter::ABaseCharacter()
@@ -51,6 +52,8 @@ void ABaseCharacter::Die()
 
 void ABaseCharacter::MulticastHandleDeath_Implementation()
 {
+	if (DeathSound) UGameplayStatics::PlaySoundAtLocation(this, DeathSound, GetActorLocation(), GetActorRotation());
+	
 	Weapon->SetSimulatePhysics(true);
 	Weapon->SetEnableGravity(true);
 	Weapon->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
