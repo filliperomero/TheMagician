@@ -97,17 +97,17 @@ void ABaseCharacter::AddCharacterAbilities()
 	MagicianASC->AddCharacterAbilities(StartupAbilities);
 }
 
-FVector ABaseCharacter::GetCombatSocketLocation_Implementation(const FGameplayTag& MontageTag)
+FVector ABaseCharacter::GetCombatSocketLocation_Implementation(const FGameplayTag& CombatSocketTag)
 {
 	const FMagicianGameplayTags& GameplayTags = FMagicianGameplayTags::Get();
 	
-	if (IsValid(Weapon) && MontageTag.MatchesTagExact(GameplayTags.Montage_Attack_Weapon))
+	if (IsValid(Weapon) && CombatSocketTag.MatchesTagExact(GameplayTags.CombatSocket_Weapon))
 		return Weapon->GetSocketLocation(WeaponTipSocketName);
 
-	if (MontageTag.MatchesTagExact(GameplayTags.Montage_Attack_LeftHand))
+	if (CombatSocketTag.MatchesTagExact(GameplayTags.CombatSocket_LeftHand))
 		return GetMesh()->GetSocketLocation(LeftHandSocketName);
 
-	if (MontageTag.MatchesTagExact(GameplayTags.Montage_Attack_RightHand))
+	if (CombatSocketTag.MatchesTagExact(GameplayTags.CombatSocket_RightHand))
 		return GetMesh()->GetSocketLocation(RightHandSocketName);
 
 	return FVector();
@@ -126,6 +126,22 @@ AActor* ABaseCharacter::GetAvatar_Implementation()
 TArray<FTaggedMontage> ABaseCharacter::GetAttackMontages_Implementation()
 {
 	return AttackMontages;
+}
+
+UNiagaraSystem* ABaseCharacter::GetBloodEffect_Implementation()
+{
+	return BloodEffect;
+}
+
+FTaggedMontage ABaseCharacter::GetTaggedMontageByTag_Implementation(const FGameplayTag& MontageTag)
+{
+	for (FTaggedMontage TaggedMontage : AttackMontages)
+	{
+		if (TaggedMontage.MontageTag.MatchesTagExact(MontageTag))
+			return TaggedMontage;
+	}
+	
+	return FTaggedMontage();
 }
 
 void ABaseCharacter::Dissolve()

@@ -20,7 +20,7 @@ void UMagicianProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLo
 {
 	if (GetAvatarActorFromActorInfo() == nullptr || !GetAvatarActorFromActorInfo()->HasAuthority()) return;
 	
-	const FVector SocketLocation = ICombatInterface::Execute_GetCombatSocketLocation(GetAvatarActorFromActorInfo(), FMagicianGameplayTags::Get().Montage_Attack_Weapon);
+	const FVector SocketLocation = ICombatInterface::Execute_GetCombatSocketLocation(GetAvatarActorFromActorInfo(), FMagicianGameplayTags::Get().CombatSocket_Weapon);
 	FRotator Rotation = (ProjectileTargetLocation - SocketLocation).Rotation();
 	Rotation.Pitch = 0.f;
 
