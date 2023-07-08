@@ -50,6 +50,8 @@ void AMagicianProjectile::Destroyed()
 	// There is a chance where destroyed is replicated before OnSphereOverlap, so we're making sure the client will be able to apply the effects
 	if (!bHit && !HasAuthority())
 	{
+		bHit = true;
+		
 		if (ImpactSound)
 			UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), FRotator::ZeroRotator);
 
@@ -75,6 +77,8 @@ void AMagicianProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedCompone
 
 	if (!bHit)
 	{
+		bHit = true;
+		
 		if (ImpactSound)
 			UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), FRotator::ZeroRotator);
 
