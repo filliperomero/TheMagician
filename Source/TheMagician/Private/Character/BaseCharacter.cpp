@@ -107,6 +107,9 @@ FVector ABaseCharacter::GetCombatSocketLocation_Implementation(const FGameplayTa
 	if (IsValid(Weapon) && CombatSocketTag.MatchesTagExact(GameplayTags.CombatSocket_Weapon))
 		return Weapon->GetSocketLocation(WeaponTipSocketName);
 
+	if (CombatSocketTag.MatchesTagExact(GameplayTags.CombatSocket_Tail))
+		return GetMesh()->GetSocketLocation(TailSocketName);
+
 	if (CombatSocketTag.MatchesTagExact(GameplayTags.CombatSocket_LeftHand))
 		return GetMesh()->GetSocketLocation(LeftHandSocketName);
 
