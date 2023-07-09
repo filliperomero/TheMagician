@@ -150,6 +150,16 @@ FTaggedMontage ABaseCharacter::GetTaggedMontageByTag_Implementation(const FGamep
 	return FTaggedMontage();
 }
 
+int32 ABaseCharacter::GetMinionCount_Implementation()
+{
+	return MinionCount;
+}
+
+void ABaseCharacter::IncrementMinionCount_Implementation(int32 Amount)
+{
+	MinionCount += Amount;
+}
+
 void ABaseCharacter::Dissolve()
 {
 	if (IsValid(DissolveMaterialInstance))
