@@ -27,6 +27,8 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 
+	// https://www.youtube.com/watch?v=WyyUPqdZQfU&ab_channel=GameIndustryConference
+	// Saying to set the AttributeSet as Transient
 	UPROPERTY()
 	TObjectPtr<UAttributeSet> AttributeSet;
 
