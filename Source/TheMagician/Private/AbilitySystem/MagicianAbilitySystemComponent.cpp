@@ -107,6 +107,21 @@ FGameplayTag UMagicianAbilitySystemComponent::GetInputTagFromSpec(const FGamepla
 	return FGameplayTag();
 }
 
+void UMagicianAbilitySystemComponent::OnRep_ActivateAbilities()
+{
+	/**
+	 * Since AddCharacterAbilities only runs on the server, we make use of this function so when the abilities are given, it will replicate to
+	 * all clients and we can act on that here. So we can call the AbilitiesGivenDelegate here as well.
+	 */
+	Super::OnRep_ActivateAbilities();
+
+	if (!bStartupAbilitiesGiven)
+	{
+		bStartupAbilitiesGiven = true; // Since we don't replicate this variable, even if we set to true before, it will be false for the first time on the client
+		AbilitiesGivenDelegate.Broadcast(this);
+	}
+}
+
 void UMagicianAbilitySystemComponent::ClientEffectApplied_Implementation(UAbilitySystemComponent* AbilitySystemComponent,
                                                                          const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle)
 {
