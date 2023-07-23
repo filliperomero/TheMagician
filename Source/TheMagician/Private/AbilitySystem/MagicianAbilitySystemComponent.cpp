@@ -4,6 +4,7 @@
 #include "AbilitySystem/MagicianAbilitySystemComponent.h"
 
 #include "AbilitySystem/Ability/MagicianGameplayAbility.h"
+#include "TheMagician/MagicianLogChannels.h"
 
 /** This Function will run once the ASC is initialized. */
 void UMagicianAbilitySystemComponent::AbilityActorInfoSet()
@@ -24,6 +25,9 @@ void UMagicianAbilitySystemComponent::AddCharacterAbilities(const TArray<TSubcla
 			GiveAbility(AbilitySpec);
 		}
 	}
+
+	bStartupAbilitiesGiven = true;
+	AbilitiesGivenDelegate.Broadcast(this);
 }
 
 void UMagicianAbilitySystemComponent::AbilityInputTagHeld(const FGameplayTag& InputTag)
@@ -60,8 +64,51 @@ void UMagicianAbilitySystemComponent::AbilityInputTagReleased(const FGameplayTag
 	}
 }
 
+void UMagicianAbilitySystemComponent::ForEachAbility(const FForEachAbility& Delegate)
+{
+	// This will lock the list of abilities until we finish the loop (this is a good practice).
+	// This is to make sure we're not removing or blocking any abilities while we're looping it
+	FScopedAbilityListLock ActiveScopeLock(*this);
+	for (const FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
+	{
+		if (!Delegate.ExecuteIfBound(AbilitySpec))
+		{
+			UE_LOG(LogMagician, Error, TEXT("Failed to execute delegate in %hs"), __FUNCTION__);
+		}
+	}
+}
+
+FGameplayTag UMagicianAbilitySystemComponent::GetAbilityTagFromSpec(const FGameplayAbilitySpec& AbilitySpec)
+{
+	if (AbilitySpec.Ability)
+	{
+		for (FGameplayTag Tag : AbilitySpec.Ability.Get()->AbilityTags)
+		{
+			if (Tag.MatchesTag(FGameplayTag::RequestGameplayTag(FName("Abilities"))))
+			{
+				return Tag;
+			}
+		}
+	}
+
+	return FGameplayTag();
+}
+
+FGameplayTag UMagicianAbilitySystemComponent::GetInputTagFromSpec(const FGameplayAbilitySpec& AbilitySpec)
+{
+	for (FGameplayTag Tag : AbilitySpec.DynamicAbilityTags)
+	{
+		if (Tag.MatchesTag(FGameplayTag::RequestGameplayTag(FName("InputTag"))))
+		{
+			return Tag;
+		}
+	}
+
+	return FGameplayTag();
+}
+
 void UMagicianAbilitySystemComponent::ClientEffectApplied_Implementation(UAbilitySystemComponent* AbilitySystemComponent,
-                                                    const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle)
+                                                                         const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle)
 {
 	FGameplayTagContainer TagContainer;
 	EffectSpec.GetAllAssetTags(TagContainer);

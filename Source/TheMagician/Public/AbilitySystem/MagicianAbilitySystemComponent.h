@@ -7,6 +7,8 @@
 #include "MagicianAbilitySystemComponent.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FEffectAssetTags, const FGameplayTagContainer& /* AssetTags */)
+DECLARE_MULTICAST_DELEGATE_OneParam(FAbilitiesGiven, UMagicianAbilitySystemComponent*);
+DECLARE_DELEGATE_OneParam(FForEachAbility, const FGameplayAbilitySpec&);
 
 /**
  * 
@@ -21,8 +23,16 @@ public:
 	void AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupAbilities);
 	void AbilityInputTagHeld(const FGameplayTag& InputTag);
 	void AbilityInputTagReleased(const FGameplayTag& InputTag);
-
+	void ForEachAbility(const FForEachAbility& Delegate);
+	
 	FEffectAssetTags EffectAssetTags;
+	FAbilitiesGiven AbilitiesGivenDelegate;
+
+	bool bStartupAbilitiesGiven { false };
+
+	/** Utility Functions */
+	static FGameplayTag GetAbilityTagFromSpec(const FGameplayAbilitySpec& AbilitySpec);
+	static FGameplayTag GetInputTagFromSpec(const FGameplayAbilitySpec& AbilitySpec);
 
 protected:
 	UFUNCTION(Client, Reliable)

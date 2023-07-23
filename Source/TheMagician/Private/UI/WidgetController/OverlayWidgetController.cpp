@@ -5,6 +5,7 @@
 
 #include "AbilitySystem/MagicianAbilitySystemComponent.h"
 #include "AbilitySystem/MagicianAttributeSet.h"
+#include "AbilitySystem/Data/AbilityInfo.h"
 
 void UOverlayWidgetController::BroadcastInitialValues()
 {
@@ -51,10 +52,10 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 				OnMaxManaChanged.Broadcast(Data.NewValue);
 			}
 		);
+	
+	UMagicianAbilitySystemComponent* MagicianASC = CastChecked<UMagicianAbilitySystemComponent>(AbilitySystemComponent);
 
-	UMagicianAbilitySystemComponent* MagicianAbilitySystemComponent = CastChecked<UMagicianAbilitySystemComponent>(AbilitySystemComponent);
-
-	MagicianAbilitySystemComponent->EffectAssetTags.AddLambda(
+	MagicianASC->EffectAssetTags.AddLambda(
 		[this](const FGameplayTagContainer& AssetTags)
 		{
 			// We're using reference here so we don't make a copy of it
@@ -70,4 +71,35 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 			}
 		}
 	);
+	
+	/**
+	 * We're not directly binding because there is a chance we bind to the delegate when the abilities has been given already, which would be too late.
+	 * So if this case is true, we just call OnInitializeStartupAbilities directly, otherwise we bind to the delegate 
+	 */
+	if (MagicianASC->bStartupAbilitiesGiven)
+	{
+		OnInitializeStartupAbilities(MagicianASC);
+	}
+	else
+	{
+		MagicianASC->AbilitiesGivenDelegate.AddUObject(this, &ThisClass::OnInitializeStartupAbilities);
+	}
+}
+
+void UOverlayWidgetController::OnInitializeStartupAbilities(UMagicianAbilitySystemComponent* MagicianAbilitySystemComponent) const
+{
+	if (!MagicianAbilitySystemComponent->bStartupAbilitiesGiven) return;
+
+	FForEachAbility BroadcastDelegate;
+	BroadcastDelegate.BindLambda(
+		[this, MagicianAbilitySystemComponent](const FGameplayAbilitySpec& AbilitySpec)
+		{
+			FMagicianAbilityInfo Info = AbilityInfo->FindAbilityInfoByTag(MagicianAbilitySystemComponent->GetAbilityTagFromSpec(AbilitySpec));
+			Info.InputTag = MagicianAbilitySystemComponent->GetInputTagFromSpec(AbilitySpec);
+
+			AbilityInfoDelegate.Broadcast(Info);
+		}
+	);
+
+	MagicianAbilitySystemComponent->ForEachAbility(BroadcastDelegate);
 }

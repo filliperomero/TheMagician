@@ -8,6 +8,8 @@
 #include "UI/WidgetController/MagicianWidgetController.h"
 #include "OverlayWidgetController.generated.h"
 
+struct FMagicianAbilityInfo;
+class UMagicianAbilitySystemComponent;
 class UAbilityInfo;
 class UMagicianUserWidget;
 struct FOnAttributeChangeData;
@@ -32,6 +34,7 @@ struct FUIWidgetRow : public FTableRowBase
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttributeChangedSignature, float, NewValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMessageWidgetRowSignature, FUIWidgetRow, Row);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAbilityInfoSignature, const FMagicianAbilityInfo&, Info);
 
 UCLASS(BlueprintType, Blueprintable)
 class THEMAGICIAN_API UOverlayWidgetController : public UMagicianWidgetController
@@ -57,6 +60,9 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "GAS|Messages")
 	FMessageWidgetRowSignature MessageWidgetRowDelegate;
 
+	UPROPERTY(BlueprintAssignable, Category = "GAS|Ability Info")
+	FAbilityInfoSignature AbilityInfoDelegate;
+
 protected:
 	template<typename T>
 	T* GetDataTableRowByTag(UDataTable* DataTable, const FGameplayTag& Tag);
@@ -66,6 +72,8 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Widget Data")
 	TObjectPtr<UAbilityInfo> AbilityInfo;
+
+	void OnInitializeStartupAbilities(UMagicianAbilitySystemComponent* MagicianAbilitySystemComponent) const;
 	
 };
 
