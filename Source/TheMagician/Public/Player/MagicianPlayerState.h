@@ -47,7 +47,7 @@ private:
 	void OnRep_Level(int32 OldLevel);
 
 	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_XP)
-	int32 XP { 0 };
+	int32 XP { 1 };
 
 	UFUNCTION()
 	void OnRep_XP(int32 OldXP);
