@@ -10,9 +10,8 @@
 class UAbilitySystemComponent;
 class UAttributeSet;
 
-/**
- * 
- */
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnPlayerStatChangedSignature, int32 /*StatValue*/)
+
 UCLASS()
 class THEMAGICIAN_API AMagicianPlayerState : public APlayerState, public IAbilitySystemInterface
 {
@@ -22,6 +21,14 @@ public:
 	AMagicianPlayerState();
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
+	void AddToLevel(int32 InLevel);
+	void SetLevel(int32 InLevel);
+	void AddToXP(int32 InXP);
+	void SetXP(int32 InXP);
+
+	FOnPlayerStatChangedSignature OnXPChangedDelegate;
+	FOnPlayerStatChangedSignature OnLevelChangedDelegate;
 
 protected:
 	UPROPERTY(VisibleAnywhere)
@@ -39,8 +46,15 @@ private:
 	UFUNCTION()
 	void OnRep_Level(int32 OldLevel);
 
+	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_XP)
+	int32 XP { 0 };
+
+	UFUNCTION()
+	void OnRep_XP(int32 OldXP);
+
 public:
 	FORCEINLINE UAttributeSet* GetAttributeSet() const { return AttributeSet; }
 	FORCEINLINE int32 GetPlayerLevel() const { return Level; }
+	FORCEINLINE int32 GetXP() const { return XP; }
 	
 };
