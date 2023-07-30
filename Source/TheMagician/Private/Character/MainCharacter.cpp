@@ -36,6 +36,8 @@ AMainCharacter::AMainCharacter()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>("Follow Camera");
 	FollowCamera->SetupAttachment(CameraBoom);
 	FollowCamera->bUsePawnControlRotation = false;
+
+	CharacterClass = ECharacterClass::Elementalist;
 }
 
 void AMainCharacter::InitAbilityActorInfo()
