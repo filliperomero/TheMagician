@@ -162,6 +162,10 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Meta Attributes")
 	FGameplayAttributeData IncomingDamage;
 	ATTRIBUTE_ACCESSORS(UMagicianAttributeSet, IncomingDamage);
+
+	UPROPERTY(BlueprintReadOnly, Category = "Meta Attributes")
+	FGameplayAttributeData IncomingXP;
+	ATTRIBUTE_ACCESSORS(UMagicianAttributeSet, IncomingXP);
 	/** End Meta Attributes */
 
 	UFUNCTION()

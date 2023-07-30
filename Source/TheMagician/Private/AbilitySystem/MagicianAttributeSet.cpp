@@ -126,6 +126,14 @@ void UMagicianAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCa
 	if (Data.EvaluatedData.Attribute == GetManaAttribute())
 		SetMana(FMath::Clamp(GetMana(), 0.f, GetMaxMana()));
 
+	if (Data.EvaluatedData.Attribute == GetIncomingXPAttribute())
+	{
+		const float LocalIncomingXP = GetIncomingXP();
+		SetIncomingXP(0.f);
+		
+		UE_LOG(LogTemp, Warning, TEXT("IncomingXP received: [%f]"), LocalIncomingXP);
+	}
+
 	if (Data.EvaluatedData.Attribute == GetIncomingDamageAttribute())
 	{
 		const float LocalIncomingDamage = GetIncomingDamage();
