@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Character/BaseCharacter.h"
+#include "Interaction/PlayerInterface.h"
 #include "MainCharacter.generated.h"
 
 class UCameraComponent;
@@ -12,7 +13,7 @@ class USpringArmComponent;
  * 
  */
 UCLASS()
-class THEMAGICIAN_API AMainCharacter : public ABaseCharacter
+class THEMAGICIAN_API AMainCharacter : public ABaseCharacter, public IPlayerInterface
 {
 	GENERATED_BODY()
 
@@ -21,7 +22,11 @@ public:
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void OnRep_PlayerState() override;
 
-	/** Begin Combat Interface */
+	/** Player Interface */
+	virtual void AddToXP_Implementation(int32 InXP) override;
+	/** End Player Interface */
+
+	/** Combat Interface */
 	virtual int32 GetPlayerLevel() override;
 	/** End Combat Interface */
 

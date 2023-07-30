@@ -8,6 +8,7 @@
 #include "AbilitySystem/MagicianAbilitySystemLibrary.h"
 #include "GameFramework/Character.h"
 #include "Interaction/CombatInterface.h"
+#include "Interaction/PlayerInterface.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/MagicianPlayerController.h"
 
@@ -131,7 +132,9 @@ void UMagicianAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCa
 		const float LocalIncomingXP = GetIncomingXP();
 		SetIncomingXP(0.f);
 		
-		UE_LOG(LogTemp, Warning, TEXT("IncomingXP received: [%f]"), LocalIncomingXP);
+		// TODO: See if we should Level Up
+		if (Props.SourceCharacter->Implements<UPlayerInterface>())
+			IPlayerInterface::Execute_AddToXP(Props.SourceCharacter, LocalIncomingXP);
 	}
 
 	if (Data.EvaluatedData.Attribute == GetIncomingDamageAttribute())
