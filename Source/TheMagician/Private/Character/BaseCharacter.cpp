@@ -98,6 +98,7 @@ void ABaseCharacter::AddCharacterAbilities()
 	UMagicianAbilitySystemComponent* MagicianASC = CastChecked<UMagicianAbilitySystemComponent>(AbilitySystemComponent);
 
 	MagicianASC->AddCharacterAbilities(StartupAbilities);
+	MagicianASC->AddCharacterPassiveAbilities(StartupPassiveAbilities);
 }
 
 FVector ABaseCharacter::GetCombatSocketLocation_Implementation(const FGameplayTag& CombatSocketTag)

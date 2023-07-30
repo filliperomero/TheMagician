@@ -30,6 +30,15 @@ void UMagicianAbilitySystemComponent::AddCharacterAbilities(const TArray<TSubcla
 	AbilitiesGivenDelegate.Broadcast(this);
 }
 
+void UMagicianAbilitySystemComponent::AddCharacterPassiveAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupPassiveAbilities)
+{
+	for (const TSubclassOf<UGameplayAbility> PassiveAbilityClass : StartupPassiveAbilities)
+	{
+		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(PassiveAbilityClass, 1);
+		GiveAbilityAndActivateOnce(AbilitySpec);
+	}
+}
+
 void UMagicianAbilitySystemComponent::AbilityInputTagHeld(const FGameplayTag& InputTag)
 {
 	if (!InputTag.IsValid()) return;
