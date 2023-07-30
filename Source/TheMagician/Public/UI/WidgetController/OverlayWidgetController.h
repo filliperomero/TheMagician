@@ -63,6 +63,9 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "GAS|Ability Info")
 	FAbilityInfoSignature AbilityInfoDelegate;
 
+	UPROPERTY(BlueprintAssignable, Category = "GAS|XP")
+	FOnAttributeChangedSignature OnXPPercentChangedDelegate;
+
 protected:
 	template<typename T>
 	T* GetDataTableRowByTag(UDataTable* DataTable, const FGameplayTag& Tag);
@@ -74,6 +77,7 @@ protected:
 	TObjectPtr<UAbilityInfo> AbilityInfo;
 
 	void OnInitializeStartupAbilities(UMagicianAbilitySystemComponent* MagicianAbilitySystemComponent) const;
+	void OnXPChanged(int32 NewXP) const;
 	
 };
 

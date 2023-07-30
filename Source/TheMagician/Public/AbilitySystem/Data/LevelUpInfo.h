@@ -30,6 +30,6 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	TArray<FMagicianLevelUpInfo> LevelUpInformation;
 
-	int32 FindLevelForXP(int32 XP);
+	int32 FindLevelForXP(int32 XP) const;
 	
 };

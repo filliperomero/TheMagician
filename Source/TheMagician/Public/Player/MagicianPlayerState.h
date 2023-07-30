@@ -7,6 +7,7 @@
 #include "GameFramework/PlayerState.h"
 #include "MagicianPlayerState.generated.h"
 
+class ULevelUpInfo;
 class UAbilitySystemComponent;
 class UAttributeSet;
 
@@ -29,6 +30,9 @@ public:
 
 	FOnPlayerStatChangedSignature OnXPChangedDelegate;
 	FOnPlayerStatChangedSignature OnLevelChangedDelegate;
+
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<ULevelUpInfo> LevelUpInfo;
 
 protected:
 	UPROPERTY(VisibleAnywhere)
