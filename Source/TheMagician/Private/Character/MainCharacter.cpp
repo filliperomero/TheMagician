@@ -90,7 +90,12 @@ void AMainCharacter::AddToXP_Implementation(int32 InXP)
 	return MagicianPlayerState->AddToXP(InXP);
 }
 
-int32 AMainCharacter::GetPlayerLevel()
+void AMainCharacter::LevelUp_Implementation()
+{
+	
+}
+
+int32 AMainCharacter::GetPlayerLevel_Implementation()
 {
 	const AMagicianPlayerState* MagicianPlayerState = GetPlayerState<AMagicianPlayerState>();
 	check(MagicianPlayerState);

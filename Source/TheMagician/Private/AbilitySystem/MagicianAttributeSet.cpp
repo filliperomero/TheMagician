@@ -192,20 +192,19 @@ void UMagicianAttributeSet::ShowFloatingText(const FEffectProperties& Props, con
 
 void UMagicianAttributeSet::SendXPEvent(const FEffectProperties& Props) const
 {
-	if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(Props.TargetCharacter))
-	{
-		const int32 TargetLevel = CombatInterface->GetPlayerLevel();
-		const ECharacterClass TargetClass = ICombatInterface::Execute_GetCharacterClass(Props.TargetCharacter);
+	if (!Props.TargetCharacter->Implements<UCombatInterface>()) return;
 
-		const int32 XPReward = UMagicianAbilitySystemLibrary::GetXPRewardByClassAndLevel(Props.TargetCharacter, TargetClass, TargetLevel);
+	const int32 TargetLevel = ICombatInterface::Execute_GetPlayerLevel(Props.TargetCharacter);
+	const ECharacterClass TargetClass = ICombatInterface::Execute_GetCharacterClass(Props.TargetCharacter);
 
-		const FMagicianGameplayTags& GameplayTags = FMagicianGameplayTags::Get();
-		FGameplayEventData Payload;
-		Payload.EventTag = GameplayTags.Attributes_Meta_IncomingXP;
-		Payload.EventMagnitude = XPReward;
-		
-		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(Props.SourceCharacter, GameplayTags.Attributes_Meta_IncomingXP, Payload);
-	}
+	const int32 XPReward = UMagicianAbilitySystemLibrary::GetXPRewardByClassAndLevel(Props.TargetCharacter, TargetClass, TargetLevel);
+
+	const FMagicianGameplayTags& GameplayTags = FMagicianGameplayTags::Get();
+	FGameplayEventData Payload;
+	Payload.EventTag = GameplayTags.Attributes_Meta_IncomingXP;
+	Payload.EventMagnitude = XPReward;
+	
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(Props.SourceCharacter, GameplayTags.Attributes_Meta_IncomingXP, Payload);
 }
 
 void UMagicianAttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth) const

@@ -91,8 +91,8 @@ void UMagicianAbilitySystemLibrary::GiveStartupAbilities(const UObject* WorldCon
 
 	int32 AbilityLevel = 1;
 
-	if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(ASC->GetAvatarActor()))
-		AbilityLevel = CombatInterface->GetPlayerLevel();
+	if (ASC->GetAvatarActor()->Implements<UCombatInterface>())
+		AbilityLevel = ICombatInterface::Execute_GetPlayerLevel(ASC->GetAvatarActor());
 
 	for (TSubclassOf<UGameplayAbility> AbilityClass : DefaultInfo.StartupAbilities)
 	{
