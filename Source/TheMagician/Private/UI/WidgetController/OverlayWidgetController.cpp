@@ -28,8 +28,14 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 	AMagicianPlayerState* MagicianPlayerState = CastChecked<AMagicianPlayerState>(PlayerState);
 	const UMagicianAttributeSet* MagicianAttributeSet = CastChecked<UMagicianAttributeSet>(AttributeSet);
 
-	/** Bind to OnXPChangedDelegate */
+	/** Bind to PlayerState Delegates */
 	MagicianPlayerState->OnXPChangedDelegate.AddUObject(this, &ThisClass::OnXPChanged);
+	MagicianPlayerState->OnLevelChangedDelegate.AddLambda(
+		[this](int32 NewLevel)
+		{
+			OnPlayerLevelChangedDelegate.Broadcast(NewLevel);
+		}
+	);
 
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(MagicianAttributeSet->GetHealthAttribute()).AddLambda(
 			[this](const FOnAttributeChangeData& Data)
