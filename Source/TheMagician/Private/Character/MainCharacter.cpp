@@ -5,6 +5,7 @@
 
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/MagicianAbilitySystemComponent.h"
+#include "AbilitySystem/Data/LevelUpInfo.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -82,6 +83,38 @@ void AMainCharacter::OnRep_PlayerState()
 	InitAbilityActorInfo();
 }
 
+int32 AMainCharacter::GetXP_Implementation() const
+{
+	const AMagicianPlayerState* MagicianPlayerState = GetPlayerState<AMagicianPlayerState>();
+	check(MagicianPlayerState);
+
+	return MagicianPlayerState->GetXP();
+}
+
+int32 AMainCharacter::FindLevelForXP_Implementation(int32 InXP)
+{
+	const AMagicianPlayerState* MagicianPlayerState = GetPlayerState<AMagicianPlayerState>();
+	check(MagicianPlayerState);
+
+	return MagicianPlayerState->LevelUpInfo->FindLevelForXP(InXP);
+}
+
+int32 AMainCharacter::GetAttributePointsReward_Implementation(int32 Level) const
+{
+	const AMagicianPlayerState* MagicianPlayerState = GetPlayerState<AMagicianPlayerState>();
+	check(MagicianPlayerState);
+
+	return MagicianPlayerState->LevelUpInfo->LevelUpInformation[Level].AttributePointAward;
+}
+
+int32 AMainCharacter::GetSpellPointsReward_Implementation(int32 Level) const
+{
+	const AMagicianPlayerState* MagicianPlayerState = GetPlayerState<AMagicianPlayerState>();
+	check(MagicianPlayerState);
+
+	return MagicianPlayerState->LevelUpInfo->LevelUpInformation[Level].AttributePointAward;
+}
+
 void AMainCharacter::AddToXP_Implementation(int32 InXP)
 {
 	AMagicianPlayerState* MagicianPlayerState = GetPlayerState<AMagicianPlayerState>();
@@ -93,6 +126,24 @@ void AMainCharacter::AddToXP_Implementation(int32 InXP)
 void AMainCharacter::LevelUp_Implementation()
 {
 	
+}
+
+void AMainCharacter::AddSpellPoints_Implementation(int32 InSpellPoints)
+{
+	// Todo: Add Spell Points to PlayerState
+}
+
+void AMainCharacter::AddAttributePoints_Implementation(int32 InAttributePoints)
+{
+	// Todo: Add Attribute Points to PlayerState
+}
+
+void AMainCharacter::AddPlayerLevel_Implementation(int32 InLevel)
+{
+	AMagicianPlayerState* MagicianPlayerState = GetPlayerState<AMagicianPlayerState>();
+	check(MagicianPlayerState);
+
+	MagicianPlayerState->AddToLevel(InLevel);
 }
 
 int32 AMainCharacter::GetPlayerLevel_Implementation()
