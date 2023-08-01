@@ -7,6 +7,7 @@
 #include "Interaction/PlayerInterface.h"
 #include "MainCharacter.generated.h"
 
+class UNiagaraComponent;
 class UCameraComponent;
 class USpringArmComponent;
 /**
@@ -38,6 +39,9 @@ public:
 	virtual int32 GetPlayerLevel_Implementation() override;
 	/** End Combat Interface */
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UNiagaraComponent> LevelUpNiagaraComponent;
+
 protected:
 	virtual void InitAbilityActorInfo() override;
 
@@ -55,6 +59,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UCameraComponent> FollowCamera;
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastLevelUpParticles() const;
 
 public:
 	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return CameraBoom; }

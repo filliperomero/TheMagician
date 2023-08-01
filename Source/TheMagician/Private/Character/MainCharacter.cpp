@@ -4,6 +4,7 @@
 #include "Character/MainCharacter.h"
 
 #include "AbilitySystemComponent.h"
+#include "NiagaraComponent.h"
 #include "AbilitySystem/MagicianAbilitySystemComponent.h"
 #include "AbilitySystem/Data/LevelUpInfo.h"
 #include "Camera/CameraComponent.h"
@@ -28,6 +29,7 @@ AMainCharacter::AMainCharacter()
 	CameraBoom->SetupAttachment(GetRootComponent());
 	CameraBoom->TargetArmLength = MaxCameraBoomDistance;
 	CameraBoom->SetRelativeRotation(FRotator(-45.f, 0.f, 0.f));
+	CameraBoom->bDoCollisionTest = false;
 	CameraBoom->bUsePawnControlRotation = false;
 	CameraBoom->bEnableCameraLag = true;
 	CameraBoom->bInheritPitch = false;
@@ -39,6 +41,10 @@ AMainCharacter::AMainCharacter()
 	FollowCamera->bUsePawnControlRotation = false;
 
 	CharacterClass = ECharacterClass::Elementalist;
+
+	LevelUpNiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("LevelUpNiagaraComponent"));
+	LevelUpNiagaraComponent->SetupAttachment(GetRootComponent());
+	LevelUpNiagaraComponent->bAutoActivate = false;
 }
 
 void AMainCharacter::InitAbilityActorInfo()
@@ -125,7 +131,19 @@ void AMainCharacter::AddToXP_Implementation(int32 InXP)
 
 void AMainCharacter::LevelUp_Implementation()
 {
-	
+	MulticastLevelUpParticles();
+}
+
+void AMainCharacter::MulticastLevelUpParticles_Implementation() const
+{
+	if (!IsValid(LevelUpNiagaraComponent)) return;
+
+	const FVector CameraLocation = FollowCamera->GetComponentLocation();
+	const FVector NiagaraSystemLocation = LevelUpNiagaraComponent->GetComponentLocation();
+	const FRotator ToCameraRotation = (CameraLocation - NiagaraSystemLocation).Rotation();
+
+	LevelUpNiagaraComponent->SetWorldRotation(ToCameraRotation);
+	LevelUpNiagaraComponent->Activate(true);
 }
 
 void AMainCharacter::AddSpellPoints_Implementation(int32 InSpellPoints)
