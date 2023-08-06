@@ -148,12 +148,18 @@ void AMainCharacter::MulticastLevelUpParticles_Implementation() const
 
 void AMainCharacter::AddSpellPoints_Implementation(int32 InSpellPoints)
 {
-	// Todo: Add Spell Points to PlayerState
+	AMagicianPlayerState* MagicianPlayerState = GetPlayerState<AMagicianPlayerState>();
+	check(MagicianPlayerState);
+
+	MagicianPlayerState->AddSpellPoints(InSpellPoints);
 }
 
 void AMainCharacter::AddAttributePoints_Implementation(int32 InAttributePoints)
 {
-	// Todo: Add Attribute Points to PlayerState
+	AMagicianPlayerState* MagicianPlayerState = GetPlayerState<AMagicianPlayerState>();
+	check(MagicianPlayerState);
+
+	MagicianPlayerState->AddAttributePoints(InAttributePoints);
 }
 
 void AMainCharacter::AddPlayerLevel_Implementation(int32 InLevel)

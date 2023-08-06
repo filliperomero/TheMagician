@@ -25,6 +25,8 @@ void AMagicianPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 
 	DOREPLIFETIME(AMagicianPlayerState, Level);
 	DOREPLIFETIME(AMagicianPlayerState, XP);
+	DOREPLIFETIME(AMagicianPlayerState, AttributePoints);
+	DOREPLIFETIME(AMagicianPlayerState, SpellPoints);
 }
 
 UAbilitySystemComponent* AMagicianPlayerState::GetAbilitySystemComponent() const
@@ -56,6 +58,18 @@ void AMagicianPlayerState::SetXP(int32 InXP)
 	OnXPChangedDelegate.Broadcast(XP);
 }
 
+void AMagicianPlayerState::AddAttributePoints(int32 InPoints)
+{
+	AttributePoints += InPoints;
+	OnAttributePointsChangedDelegate.Broadcast(AttributePoints);
+}
+
+void AMagicianPlayerState::AddSpellPoints(int32 InPoints)
+{
+	SpellPoints += InPoints;
+	OnSpellPointsChangedDelegate.Broadcast(SpellPoints);
+}
+
 void AMagicianPlayerState::OnRep_Level(int32 OldLevel)
 {
 	OnLevelChangedDelegate.Broadcast(Level);
@@ -64,4 +78,14 @@ void AMagicianPlayerState::OnRep_Level(int32 OldLevel)
 void AMagicianPlayerState::OnRep_XP(int32 OldXP)
 {
 	OnXPChangedDelegate.Broadcast(XP);
+}
+
+void AMagicianPlayerState::OnRep_AttributePoints(int32 OldAttributePoints)
+{
+	OnAttributePointsChangedDelegate.Broadcast(AttributePoints);
+}
+
+void AMagicianPlayerState::OnRep_SpellPoints(int32 OldSpellPoints)
+{
+	OnSpellPointsChangedDelegate.Broadcast(SpellPoints);
 }

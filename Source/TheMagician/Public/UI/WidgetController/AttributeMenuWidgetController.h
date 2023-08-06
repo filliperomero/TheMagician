@@ -24,8 +24,14 @@ public:
 	virtual void BroadcastInitialValues() override;
 	virtual void BindCallbacksToDependencies() override;
 
-	UPROPERTY(BlueprintAssignable, Category = "GAS | Attributes")
+	UPROPERTY(BlueprintAssignable, Category = "GAS|Attributes")
 	FAttributeInfoSignature AttributeInfoDelegate;
+
+	UPROPERTY(BlueprintAssignable, Category = "GAS|Attributes")
+	FOnPlayerStatChangedSignature AttributePointsChangedDelegate;
+
+	UPROPERTY(BlueprintAssignable, Category = "GAS|Attributes")
+	FOnPlayerStatChangedSignature SpellPointsChangedDelegate;
 
 protected:
 	UPROPERTY(EditDefaultsOnly)

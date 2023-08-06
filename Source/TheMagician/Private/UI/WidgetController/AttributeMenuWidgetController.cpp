@@ -4,6 +4,7 @@
 #include "UI/WidgetController/AttributeMenuWidgetController.h"
 #include "AbilitySystem/MagicianAttributeSet.h"
 #include "AbilitySystem/Data/AttributeInfo.h"
+#include "Player/MagicianPlayerState.h"
 
 void UAttributeMenuWidgetController::BroadcastInitialValues()
 {
@@ -17,6 +18,11 @@ void UAttributeMenuWidgetController::BroadcastInitialValues()
 	{
 		BroadcastAttributeInfo(Pair.Key, Pair.Value()); // Pair.Value() will return the FGameplayAttribute
 	}
+
+	const AMagicianPlayerState* MagicianPlayerState = CastChecked<AMagicianPlayerState>(PlayerState);
+	
+	AttributePointsChangedDelegate.Broadcast(MagicianPlayerState->GetAttributePoints());
+	SpellPointsChangedDelegate.Broadcast(MagicianPlayerState->GetSpellPoints());
 }
 
 void UAttributeMenuWidgetController::BindCallbacksToDependencies()
@@ -36,6 +42,21 @@ void UAttributeMenuWidgetController::BindCallbacksToDependencies()
 			}
 		);
 	}
+
+	AMagicianPlayerState* MagicianPlayerState = CastChecked<AMagicianPlayerState>(PlayerState);
+	MagicianPlayerState->OnAttributePointsChangedDelegate.AddLambda(
+		[this](int32 Points)
+		{
+			AttributePointsChangedDelegate.Broadcast(Points);
+		}
+	);
+
+	MagicianPlayerState->OnSpellPointsChangedDelegate.AddLambda(
+		[this](int32 Points)
+		{
+			SpellPointsChangedDelegate.Broadcast(Points);
+		}
+	);
 }
 
 void UAttributeMenuWidgetController::BroadcastAttributeInfo(const FGameplayTag& AttributeTag,
