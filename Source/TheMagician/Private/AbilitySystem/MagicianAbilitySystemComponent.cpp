@@ -3,7 +3,9 @@
 
 #include "AbilitySystem/MagicianAbilitySystemComponent.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystem/Ability/MagicianGameplayAbility.h"
+#include "Interaction/PlayerInterface.h"
 #include "TheMagician/MagicianLogChannels.h"
 
 /** This Function will run once the ASC is initialized. */
@@ -85,6 +87,28 @@ void UMagicianAbilitySystemComponent::ForEachAbility(const FForEachAbility& Dele
 			UE_LOG(LogMagician, Error, TEXT("Failed to execute delegate in %hs"), __FUNCTION__);
 		}
 	}
+}
+
+void UMagicianAbilitySystemComponent::UpgradeAttribute(const FGameplayTag& AttributeTag)
+{
+	if (!GetAvatarActor()->Implements<UPlayerInterface>() || IPlayerInterface::Execute_GetAttributePoints(GetAvatarActor()) <= 0) return;
+
+	// Inform the server that we want to upgrade the attribute since it's the server's job to do it
+	ServerUpgradeAttribute(AttributeTag);
+}
+
+void UMagicianAbilitySystemComponent::ServerUpgradeAttribute_Implementation(const FGameplayTag& AttributeTag)
+{
+	// Checks if the Player really have points to spend
+	if (!GetAvatarActor()->Implements<UPlayerInterface>() || IPlayerInterface::Execute_GetAttributePoints(GetAvatarActor()) <= 0) return;
+	
+	FGameplayEventData Payload;
+	Payload.EventTag = AttributeTag;
+	Payload.EventMagnitude = 1.f;
+
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetAvatarActor(), AttributeTag, Payload);
+	// Remove 1 point from the Player's Attribute Points
+	IPlayerInterface::Execute_AddAttributePoints(GetAvatarActor(), -1);
 }
 
 FGameplayTag UMagicianAbilitySystemComponent::GetAbilityTagFromSpec(const FGameplayAbilitySpec& AbilitySpec)

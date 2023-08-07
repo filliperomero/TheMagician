@@ -170,6 +170,22 @@ void AMainCharacter::AddPlayerLevel_Implementation(int32 InLevel)
 	MagicianPlayerState->AddToLevel(InLevel);
 }
 
+int32 AMainCharacter::GetAttributePoints_Implementation() const
+{
+	const AMagicianPlayerState* MagicianPlayerState = GetPlayerState<AMagicianPlayerState>();
+	check(MagicianPlayerState);
+
+	return MagicianPlayerState->GetAttributePoints();
+}
+
+int32 AMainCharacter::GetSpellPoints_Implementation() const
+{
+	const AMagicianPlayerState* MagicianPlayerState = GetPlayerState<AMagicianPlayerState>();
+	check(MagicianPlayerState);
+
+	return MagicianPlayerState->GetSpellPoints();
+}
+
 int32 AMainCharacter::GetPlayerLevel_Implementation()
 {
 	const AMagicianPlayerState* MagicianPlayerState = GetPlayerState<AMagicianPlayerState>();
