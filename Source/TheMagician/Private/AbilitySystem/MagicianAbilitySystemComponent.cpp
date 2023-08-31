@@ -4,6 +4,7 @@
 #include "AbilitySystem/MagicianAbilitySystemComponent.h"
 
 #include "AbilitySystemBlueprintLibrary.h"
+#include "MagicianGameplayTags.h"
 #include "AbilitySystem/Ability/MagicianGameplayAbility.h"
 #include "Interaction/PlayerInterface.h"
 #include "TheMagician/MagicianLogChannels.h"
@@ -24,6 +25,7 @@ void UMagicianAbilitySystemComponent::AddCharacterAbilities(const TArray<TSubcla
 		if (const UMagicianGameplayAbility* MagicianAbility = Cast<UMagicianGameplayAbility>(AbilitySpec.Ability))
 		{
 			AbilitySpec.DynamicAbilityTags.AddTag(MagicianAbility->StartupInputTag);
+			AbilitySpec.DynamicAbilityTags.AddTag(FMagicianGameplayTags::Get().Abilities_Status_Equipped);
 			GiveAbility(AbilitySpec);
 		}
 	}
@@ -134,6 +136,19 @@ FGameplayTag UMagicianAbilitySystemComponent::GetInputTagFromSpec(const FGamepla
 		if (Tag.MatchesTag(FGameplayTag::RequestGameplayTag(FName("InputTag"))))
 		{
 			return Tag;
+		}
+	}
+
+	return FGameplayTag();
+}
+
+FGameplayTag UMagicianAbilitySystemComponent::GetStatusFromSpec(const FGameplayAbilitySpec& AbilitySpec)
+{
+	for (FGameplayTag StatusTag : AbilitySpec.DynamicAbilityTags)
+	{
+		if (StatusTag.MatchesTag(FGameplayTag::RequestGameplayTag(FName("Abilities.Status"))))
+		{
+			return StatusTag;
 		}
 	}
 
