@@ -7,10 +7,13 @@
 #include "Data/CharacterClassInfo.h"
 #include "MagicianAbilitySystemLibrary.generated.h"
 
+class USpellMenuWidgetController;
 struct FGameplayEffectContextHandle;
 class UAbilitySystemComponent;
 class UAttributeMenuWidgetController;
 class UOverlayWidgetController;
+struct FWidgetControllerParams;
+class AMagicianHUD;
 /**
  * 
  */
@@ -20,12 +23,17 @@ class THEMAGICIAN_API UMagicianAbilitySystemLibrary : public UBlueprintFunctionL
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintPure, Category = "MagicianAbilitySystemLibrary|WidgetController")
-	static UOverlayWidgetController* GetOverlayWidgetController(const UObject* WorldContextObject);
-
+	UFUNCTION(BlueprintPure, Category = "MagicianAbilitySystemLibrary|WidgetController", meta = (DefaultToSelf = "WorldContextObject"))
+	static bool MakeWidgetControllerParams(const UObject* WorldContextObject, FWidgetControllerParams& OutWCParams, AMagicianHUD*& OutMagicianHUD);
 	
-	UFUNCTION(BlueprintPure, Category = "MagicianAbilitySystemLibrary|WidgetController")
+	UFUNCTION(BlueprintPure, Category = "MagicianAbilitySystemLibrary|WidgetController", meta = (DefaultToSelf = "WorldContextObject"))
+	static UOverlayWidgetController* GetOverlayWidgetController(const UObject* WorldContextObject);
+	
+	UFUNCTION(BlueprintPure, Category = "MagicianAbilitySystemLibrary|WidgetController", meta = (DefaultToSelf = "WorldContextObject"))
 	static UAttributeMenuWidgetController* GetAttributeMenuWidgetController(const UObject* WorldContextObject);
+
+	UFUNCTION(BlueprintPure, Category = "MagicianAbilitySystemLibrary|WidgetController", meta = (DefaultToSelf = "WorldContextObject"))
+	static USpellMenuWidgetController* GetSpellMenuWidgetController(const UObject* WorldContextObject);
 
 	UFUNCTION(BlueprintCallable, Category = "MagicianAbilitySystemLibrary|CharacterClassDefaults")
 	static void InitializeDefaultAttributes(const UObject* WorldContextObject, ECharacterClass CharacterClass, float Level, UAbilitySystemComponent* ASC);

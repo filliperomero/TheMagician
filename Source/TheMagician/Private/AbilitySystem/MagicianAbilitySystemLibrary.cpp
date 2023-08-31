@@ -12,42 +12,65 @@
 #include "UI/HUD/MagicianHUD.h"
 #include "UI/WidgetController/MagicianWidgetController.h"
 
-UOverlayWidgetController* UMagicianAbilitySystemLibrary::GetOverlayWidgetController(const UObject* WorldContextObject)
+bool UMagicianAbilitySystemLibrary::MakeWidgetControllerParams(const UObject* WorldContextObject, FWidgetControllerParams& OutWCParams, AMagicianHUD*& OutMagicianHUD)
 {
 	if (APlayerController* PC = UGameplayStatics::GetPlayerController(WorldContextObject, 0))
 	{
-		if(AMagicianHUD* MagicianHUD = Cast<AMagicianHUD>(PC->GetHUD()))
+		OutMagicianHUD = Cast<AMagicianHUD>(PC->GetHUD());
+		if(OutMagicianHUD)
 		{
 			AMagicianPlayerState* PS = PC->GetPlayerState<AMagicianPlayerState>();
 			UAbilitySystemComponent* ASC = PS->GetAbilitySystemComponent();
 			UAttributeSet* AS = PS->GetAttributeSet();
 
-			const FWidgetControllerParams WidgetControllerParams(PC, PS, ASC, AS);
-
-			return MagicianHUD->GetOverlayWidgetController(WidgetControllerParams);
+			OutWCParams.AttributeSet = AS;
+			OutWCParams.AbilitySystemComponent = ASC;
+			OutWCParams.PlayerState = PS;
+			OutWCParams.PlayerController = PC;
+			
+			return true;
 		}
 	}
 
+	return false;
+}
+
+UOverlayWidgetController* UMagicianAbilitySystemLibrary::GetOverlayWidgetController(const UObject* WorldContextObject)
+{
+	FWidgetControllerParams WCParams;
+	AMagicianHUD* MagicianHUD = nullptr;
+	
+	if (MakeWidgetControllerParams(WorldContextObject, WCParams, MagicianHUD))
+	{
+		return  MagicianHUD->GetOverlayWidgetController(WCParams);
+	}
+	
 	return nullptr;
 }
 
-UAttributeMenuWidgetController* UMagicianAbilitySystemLibrary::GetAttributeMenuWidgetController(
-	const UObject* WorldContextObject)
+UAttributeMenuWidgetController* UMagicianAbilitySystemLibrary::GetAttributeMenuWidgetController(const UObject* WorldContextObject)
 {
-	if (APlayerController* PC = UGameplayStatics::GetPlayerController(WorldContextObject, 0))
+	FWidgetControllerParams WCParams;
+	AMagicianHUD* MagicianHUD = nullptr;
+	
+	if (MakeWidgetControllerParams(WorldContextObject, WCParams, MagicianHUD))
 	{
-		if(AMagicianHUD* MagicianHUD = Cast<AMagicianHUD>(PC->GetHUD()))
-		{
-			AMagicianPlayerState* PS = PC->GetPlayerState<AMagicianPlayerState>();
-			UAbilitySystemComponent* ASC = PS->GetAbilitySystemComponent();
-			UAttributeSet* AS = PS->GetAttributeSet();
-
-			const FWidgetControllerParams WidgetControllerParams(PC, PS, ASC, AS);
-
-			return MagicianHUD->GetAttributeMenuWidgetController(WidgetControllerParams);
-		}
+		return  MagicianHUD->GetAttributeMenuWidgetController(WCParams);
 	}
+	
+	return nullptr;
+}
 
+USpellMenuWidgetController* UMagicianAbilitySystemLibrary::GetSpellMenuWidgetController(const UObject* WorldContextObject)
+{
+	FWidgetControllerParams WCParams;
+	AMagicianHUD* MagicianHUD = nullptr;
+	
+	if (MakeWidgetControllerParams(WorldContextObject, WCParams, MagicianHUD))
+	{
+		return  MagicianHUD->GetSpellMenuWidgetController(WCParams);
+	}
+	
 	return nullptr;
 }
 

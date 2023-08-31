@@ -6,10 +6,7 @@
 #include "UI/WidgetController/MagicianWidgetController.h"
 #include "SpellMenuWidgetController.generated.h"
 
-/**
- * 
- */
-UCLASS()
+UCLASS(BlueprintType, Blueprintable)
 class THEMAGICIAN_API USpellMenuWidgetController : public UMagicianWidgetController
 {
 	GENERATED_BODY()
