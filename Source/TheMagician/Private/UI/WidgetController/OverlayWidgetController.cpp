@@ -12,62 +12,55 @@
 void UOverlayWidgetController::BroadcastInitialValues()
 {
 	Super::BroadcastInitialValues();
-
-	const UMagicianAttributeSet* MagicianAttributeSet = CastChecked<UMagicianAttributeSet>(AttributeSet);
-
-	OnHealthChanged.Broadcast(MagicianAttributeSet->GetHealth());
-	OnMaxHealthChanged.Broadcast(MagicianAttributeSet->GetMaxHealth());
-	OnManaChanged.Broadcast(MagicianAttributeSet->GetMana());
-	OnMaxManaChanged.Broadcast(MagicianAttributeSet->GetMaxMana());
+	
+	OnHealthChanged.Broadcast(GetMagicianAS()->GetHealth());
+	OnMaxHealthChanged.Broadcast(GetMagicianAS()->GetMaxHealth());
+	OnManaChanged.Broadcast(GetMagicianAS()->GetMana());
+	OnMaxManaChanged.Broadcast(GetMagicianAS()->GetMaxMana());
 }
 
 void UOverlayWidgetController::BindCallbacksToDependencies()
 {
 	Super::BindCallbacksToDependencies();
-
-	AMagicianPlayerState* MagicianPlayerState = CastChecked<AMagicianPlayerState>(PlayerState);
-	const UMagicianAttributeSet* MagicianAttributeSet = CastChecked<UMagicianAttributeSet>(AttributeSet);
-
+	
 	/** Bind to PlayerState Delegates */
-	MagicianPlayerState->OnXPChangedDelegate.AddUObject(this, &ThisClass::OnXPChanged);
-	MagicianPlayerState->OnLevelChangedDelegate.AddLambda(
+	GetMagicianPS()->OnXPChangedDelegate.AddUObject(this, &ThisClass::OnXPChanged);
+	GetMagicianPS()->OnLevelChangedDelegate.AddLambda(
 		[this](int32 NewLevel)
 		{
 			OnPlayerLevelChangedDelegate.Broadcast(NewLevel);
 		}
 	);
 
-	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(MagicianAttributeSet->GetHealthAttribute()).AddLambda(
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(GetMagicianAS()->GetHealthAttribute()).AddLambda(
 			[this](const FOnAttributeChangeData& Data)
 			{
 				OnHealthChanged.Broadcast(Data.NewValue);
 			}
 		);
 
-	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(MagicianAttributeSet->GetMaxHealthAttribute()).AddLambda(
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(GetMagicianAS()->GetMaxHealthAttribute()).AddLambda(
 			[this](const FOnAttributeChangeData& Data)
 			{
 				OnMaxHealthChanged.Broadcast(Data.NewValue);
 			}
 		);
 
-	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(MagicianAttributeSet->GetManaAttribute()).AddLambda(
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(GetMagicianAS()->GetManaAttribute()).AddLambda(
 			[this](const FOnAttributeChangeData& Data)
 			{
 				OnManaChanged.Broadcast(Data.NewValue);
 			}
 		);
 
-	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(MagicianAttributeSet->GetMaxManaAttribute()).AddLambda(
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(GetMagicianAS()->GetMaxManaAttribute()).AddLambda(
 			[this](const FOnAttributeChangeData& Data)
 			{
 				OnMaxManaChanged.Broadcast(Data.NewValue);
 			}
 		);
 	
-	UMagicianAbilitySystemComponent* MagicianASC = CastChecked<UMagicianAbilitySystemComponent>(AbilitySystemComponent);
-
-	MagicianASC->EffectAssetTags.AddLambda(
+	GetMagicianASC()->EffectAssetTags.AddLambda(
 		[this](const FGameplayTagContainer& AssetTags)
 		{
 			// We're using reference here so we don't make a copy of it
@@ -86,41 +79,22 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 	
 	/**
 	 * We're not directly binding because there is a chance we bind to the delegate when the abilities has been given already, which would be too late.
-	 * So if this case is true, we just call OnInitializeStartupAbilities directly, otherwise we bind to the delegate 
+	 * So if this case is true, we just call BroadcastAbilityInfo directly, otherwise we bind to the delegate 
 	 */
-	if (MagicianASC->bStartupAbilitiesGiven)
+	if (GetMagicianASC()->bStartupAbilitiesGiven)
 	{
-		OnInitializeStartupAbilities(MagicianASC);
+		BroadcastAbilityInfo();
 	}
 	else
 	{
-		MagicianASC->AbilitiesGivenDelegate.AddUObject(this, &ThisClass::OnInitializeStartupAbilities);
+		GetMagicianASC()->AbilitiesGivenDelegate.AddUObject(this, &ThisClass::BroadcastAbilityInfo);
 	}
 }
 
-void UOverlayWidgetController::OnInitializeStartupAbilities(UMagicianAbilitySystemComponent* MagicianAbilitySystemComponent) const
-{
-	if (!MagicianAbilitySystemComponent->bStartupAbilitiesGiven) return;
-
-	FForEachAbility BroadcastDelegate;
-	BroadcastDelegate.BindLambda(
-		[this, MagicianAbilitySystemComponent](const FGameplayAbilitySpec& AbilitySpec)
-		{
-			FMagicianAbilityInfo Info = AbilityInfo->FindAbilityInfoByTag(MagicianAbilitySystemComponent->GetAbilityTagFromSpec(AbilitySpec));
-			Info.InputTag = MagicianAbilitySystemComponent->GetInputTagFromSpec(AbilitySpec);
-
-			AbilityInfoDelegate.Broadcast(Info);
-		}
-	);
-
-	MagicianAbilitySystemComponent->ForEachAbility(BroadcastDelegate);
-}
-
-void UOverlayWidgetController::OnXPChanged(int32 NewXP) const
+void UOverlayWidgetController::OnXPChanged(int32 NewXP)
 {
 	// This will become a static cast and it'll not concern too much
-	const AMagicianPlayerState* MagicianPlayerState = CastChecked<AMagicianPlayerState>(PlayerState);
-	const ULevelUpInfo* LevelUpInfo = MagicianPlayerState->LevelUpInfo;
+	const ULevelUpInfo* LevelUpInfo = GetMagicianPS()->LevelUpInfo;
 
 	checkf(LevelUpInfo, TEXT("Unable to find LevelUpInfo. Please fill out MagicianPlayerState Blueprint"));
 

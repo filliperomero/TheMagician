@@ -13,18 +13,14 @@ void UAttributeMenuWidgetController::BroadcastInitialValues()
 	Super::BroadcastInitialValues();
 
 	check(AttributeInfo);
-
-	const UMagicianAttributeSet* AS = CastChecked<UMagicianAttributeSet>(AttributeSet);
-
-	for (auto& Pair : AS->TagsToAttributes)
+	
+	for (auto& Pair : GetMagicianAS()->TagsToAttributes)
 	{
 		BroadcastAttributeInfo(Pair.Key, Pair.Value()); // Pair.Value() will return the FGameplayAttribute
 	}
-
-	const AMagicianPlayerState* MagicianPlayerState = CastChecked<AMagicianPlayerState>(PlayerState);
 	
-	AttributePointsChangedDelegate.Broadcast(MagicianPlayerState->GetAttributePoints());
-	SpellPointsChangedDelegate.Broadcast(MagicianPlayerState->GetSpellPoints());
+	AttributePointsChangedDelegate.Broadcast(GetMagicianPS()->GetAttributePoints());
+	SpellPointsChangedDelegate.Broadcast(GetMagicianPS()->GetSpellPoints());
 }
 
 void UAttributeMenuWidgetController::BindCallbacksToDependencies()
@@ -32,10 +28,8 @@ void UAttributeMenuWidgetController::BindCallbacksToDependencies()
 	Super::BindCallbacksToDependencies();
 
 	check(AttributeInfo);
-
-	const UMagicianAttributeSet* AS = CastChecked<UMagicianAttributeSet>(AttributeSet);
-
-	for (auto& Pair : AS->TagsToAttributes)
+	
+	for (auto& Pair : GetMagicianAS()->TagsToAttributes)
 	{
 		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(Pair.Value()).AddLambda(
 			[this, Pair](const FOnAttributeChangeData& Data)
@@ -44,16 +38,15 @@ void UAttributeMenuWidgetController::BindCallbacksToDependencies()
 			}
 		);
 	}
-
-	AMagicianPlayerState* MagicianPlayerState = CastChecked<AMagicianPlayerState>(PlayerState);
-	MagicianPlayerState->OnAttributePointsChangedDelegate.AddLambda(
+	
+	GetMagicianPS()->OnAttributePointsChangedDelegate.AddLambda(
 		[this](int32 Points)
 		{
 			AttributePointsChangedDelegate.Broadcast(Points);
 		}
 	);
 
-	MagicianPlayerState->OnSpellPointsChangedDelegate.AddLambda(
+	GetMagicianPS()->OnSpellPointsChangedDelegate.AddLambda(
 		[this](int32 Points)
 		{
 			SpellPointsChangedDelegate.Broadcast(Points);
@@ -63,8 +56,7 @@ void UAttributeMenuWidgetController::BindCallbacksToDependencies()
 
 void UAttributeMenuWidgetController::UpgradeAttribute(const FGameplayTag& AttributeTag)
 {
-	UMagicianAbilitySystemComponent* MagicianASC = CastChecked<UMagicianAbilitySystemComponent>(AbilitySystemComponent);
-	MagicianASC->UpgradeAttribute(AttributeTag);
+	GetMagicianASC()->UpgradeAttribute(AttributeTag);
 }
 
 void UAttributeMenuWidgetController::BroadcastAttributeInfo(const FGameplayTag& AttributeTag, const FGameplayAttribute& Attribute) const

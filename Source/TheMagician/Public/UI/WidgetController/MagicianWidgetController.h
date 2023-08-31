@@ -6,9 +6,15 @@
 #include "MagicianWidgetController.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerStatChangedSignature, int32, NewValue);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAbilityInfoSignature, const FMagicianAbilityInfo&, Info);
 
 class UAbilitySystemComponent;
 class UAttributeSet;
+class AMagicianPlayerController;
+class AMagicianPlayerState;
+class UMagicianAbilitySystemComponent;
+class UMagicianAttributeSet;
+class UAbilityInfo;
 
 USTRUCT(BlueprintType)
 struct FWidgetControllerParams
@@ -47,8 +53,16 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void BroadcastInitialValues();
 	virtual void BindCallbacksToDependencies();
+	
+	UPROPERTY(BlueprintAssignable, Category = "GAS|Ability Info")
+	FAbilityInfoSignature AbilityInfoDelegate;
+
+	void BroadcastAbilityInfo();
 
 protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Widget Data")
+	TObjectPtr<UAbilityInfo> AbilityInfo;
+	
 	UPROPERTY(BlueprintReadOnly, Category = "Widget Controller")
 	TObjectPtr<APlayerController> PlayerController;
 
@@ -60,4 +74,21 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Widget Controller")
 	TObjectPtr<UAttributeSet> AttributeSet;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Widget Controller")
+	TObjectPtr<AMagicianPlayerController> MagicianPlayerController;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Widget Controller")
+	TObjectPtr<AMagicianPlayerState> MagicianPlayerState;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Widget Controller")
+	TObjectPtr<UMagicianAbilitySystemComponent> MagicianAbilitySystemComponent;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Widget Controller")
+	TObjectPtr<UMagicianAttributeSet> MagicianAttributeSet;
+
+	AMagicianPlayerController* GetMagicianPC();
+	AMagicianPlayerState* GetMagicianPS();
+	UMagicianAbilitySystemComponent* GetMagicianASC();
+	UMagicianAttributeSet* GetMagicianAS();
 };
