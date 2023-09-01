@@ -35,6 +35,7 @@ void UMagicianWidgetController::BroadcastAbilityInfo()
 		{
 			FMagicianAbilityInfo Info = AbilityInfo->FindAbilityInfoByTag(MagicianAbilitySystemComponent->GetAbilityTagFromSpec(AbilitySpec));
 			Info.InputTag = MagicianAbilitySystemComponent->GetInputTagFromSpec(AbilitySpec);
+			Info.StatusTag = MagicianAbilitySystemComponent->GetStatusFromSpec(AbilitySpec);
 
 			AbilityInfoDelegate.Broadcast(Info);
 		}
