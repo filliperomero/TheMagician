@@ -6,6 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "MagicianGameModeBase.generated.h"
 
+class UAbilityInfo;
 class UCharacterClassInfo;
 
 /**
@@ -19,4 +20,7 @@ class THEMAGICIAN_API AMagicianGameModeBase : public AGameModeBase
 public:
 	UPROPERTY(EditDefaultsOnly, Category = "Character Class Defaults")
 	TObjectPtr<UCharacterClassInfo> CharacterClassInfo;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Ability Info")
+	TObjectPtr<UAbilityInfo> AbilityInfo;
 };

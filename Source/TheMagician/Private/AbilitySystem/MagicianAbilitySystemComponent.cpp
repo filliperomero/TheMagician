@@ -5,7 +5,9 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "MagicianGameplayTags.h"
+#include "AbilitySystem/MagicianAbilitySystemLibrary.h"
 #include "AbilitySystem/Ability/MagicianGameplayAbility.h"
+#include "AbilitySystem/Data/AbilityInfo.h"
 #include "Interaction/PlayerInterface.h"
 #include "TheMagician/MagicianLogChannels.h"
 
@@ -99,6 +101,29 @@ void UMagicianAbilitySystemComponent::UpgradeAttribute(const FGameplayTag& Attri
 	ServerUpgradeAttribute(AttributeTag);
 }
 
+void UMagicianAbilitySystemComponent::UpdateAbilityStatuses(int32 Level)
+{
+	UAbilityInfo* AbilityInfo = UMagicianAbilitySystemLibrary::GetAbilityInfo(GetAvatarActor());
+
+	if (AbilityInfo == nullptr) return;
+
+	for (const FMagicianAbilityInfo& Info : AbilityInfo->AbilityInformation)
+	{
+		if (Level < Info.LevelRequirement || !Info.AbilityTag.IsValid()) continue;
+
+		// If it's nullptr, it means that it is not in our activatable abilities (which means that it was not given yet).
+		// So we need to give the ability to the Character
+		if (GetSpecFromAbilityTag(Info.AbilityTag) == nullptr)
+		{
+			FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(Info.Ability, 1);
+			AbilitySpec.DynamicAbilityTags.AddTag(FMagicianGameplayTags::Get().Abilities_Status_Eligible);
+
+			GiveAbility(AbilitySpec);
+			MarkAbilitySpecDirty(AbilitySpec); // Force AbilitySpec to replicate
+		}
+	}
+}
+
 void UMagicianAbilitySystemComponent::ServerUpgradeAttribute_Implementation(const FGameplayTag& AttributeTag)
 {
 	// Checks if the Player really have points to spend
@@ -111,6 +136,24 @@ void UMagicianAbilitySystemComponent::ServerUpgradeAttribute_Implementation(cons
 	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetAvatarActor(), AttributeTag, Payload);
 	// Remove 1 point from the Player's Attribute Points
 	IPlayerInterface::Execute_AddAttributePoints(GetAvatarActor(), -1);
+}
+
+FGameplayAbilitySpec* UMagicianAbilitySystemComponent::GetSpecFromAbilityTag(const FGameplayTag& AbilityTag)
+{
+	FScopedAbilityListLock ActiveScopeLoc(*this);
+
+	for (FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
+	{
+		for (FGameplayTag Tag : AbilitySpec.Ability.Get()->AbilityTags)
+		{
+			if (Tag.MatchesTag(AbilityTag))
+			{
+				return &AbilitySpec;
+			}
+		}
+	}
+
+	return nullptr;
 }
 
 FGameplayTag UMagicianAbilitySystemComponent::GetAbilityTagFromSpec(const FGameplayAbilitySpec& AbilitySpec)

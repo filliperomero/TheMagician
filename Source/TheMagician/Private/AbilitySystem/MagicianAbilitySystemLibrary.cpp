@@ -133,6 +133,15 @@ UCharacterClassInfo* UMagicianAbilitySystemLibrary::GetCharacterClassInfo(const 
 	return MagicianGameMode->CharacterClassInfo;
 }
 
+UAbilityInfo* UMagicianAbilitySystemLibrary::GetAbilityInfo(const UObject* WorldContextObject)
+{
+	const AMagicianGameModeBase* MagicianGameMode = Cast<AMagicianGameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
+
+	if (MagicianGameMode == nullptr) return nullptr;
+
+	return MagicianGameMode->AbilityInfo;
+}
+
 bool UMagicianAbilitySystemLibrary::IsBlockedHit(const FGameplayEffectContextHandle& EffectContextHandle)
 {
 	if (const FMagicianGameplayEffectContext* MagicianContext = static_cast<const FMagicianGameplayEffectContext*>(EffectContextHandle.Get()))

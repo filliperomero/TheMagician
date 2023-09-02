@@ -28,6 +28,7 @@ public:
 	void AbilityInputTagReleased(const FGameplayTag& InputTag);
 	void ForEachAbility(const FForEachAbility& Delegate);
 	void UpgradeAttribute(const FGameplayTag& AttributeTag);
+	void UpdateAbilityStatuses(int32 Level);
 
 	UFUNCTION(Server, Reliable)
 	void ServerUpgradeAttribute(const FGameplayTag& AttributeTag);
@@ -37,6 +38,8 @@ public:
 
 	bool bStartupAbilitiesGiven { false };
 
+	FGameplayAbilitySpec* GetSpecFromAbilityTag(const FGameplayTag& AbilityTag);
+	
 	/** Utility Functions */
 	static FGameplayTag GetAbilityTagFromSpec(const FGameplayAbilitySpec& AbilitySpec);
 	static FGameplayTag GetInputTagFromSpec(const FGameplayAbilitySpec& AbilitySpec);
