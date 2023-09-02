@@ -120,6 +120,8 @@ void UMagicianAbilitySystemComponent::UpdateAbilityStatuses(int32 Level)
 
 			GiveAbility(AbilitySpec);
 			MarkAbilitySpecDirty(AbilitySpec); // Force AbilitySpec to replicate
+			// Call Client's RPC to update in the Client the information
+			ClientUpdateAbilityStatus(Info.AbilityTag, FMagicianGameplayTags::Get().Abilities_Status_Eligible);
 		}
 	}
 }
@@ -196,6 +198,11 @@ FGameplayTag UMagicianAbilitySystemComponent::GetStatusFromSpec(const FGameplayA
 	}
 
 	return FGameplayTag();
+}
+
+void UMagicianAbilitySystemComponent::ClientUpdateAbilityStatus_Implementation(const FGameplayTag& AbilityTag, const FGameplayTag& StatusTag)
+{
+	AbilityStatusDelegate.Broadcast(AbilityTag, StatusTag);
 }
 
 void UMagicianAbilitySystemComponent::OnRep_ActivateAbilities()

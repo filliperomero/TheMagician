@@ -168,6 +168,11 @@ void AMainCharacter::AddPlayerLevel_Implementation(int32 InLevel)
 	check(MagicianPlayerState);
 
 	MagicianPlayerState->AddToLevel(InLevel);
+
+	if (UMagicianAbilitySystemComponent* MagicianASC = Cast<UMagicianAbilitySystemComponent>(GetAbilitySystemComponent()))
+	{
+		MagicianASC->UpdateAbilityStatuses(MagicianPlayerState->GetPlayerLevel());
+	}
 }
 
 int32 AMainCharacter::GetAttributePoints_Implementation() const
