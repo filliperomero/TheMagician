@@ -121,9 +121,37 @@ void UMagicianAbilitySystemComponent::UpdateAbilityStatuses(int32 Level)
 			GiveAbility(AbilitySpec);
 			MarkAbilitySpecDirty(AbilitySpec); // Force AbilitySpec to replicate
 			// Call Client's RPC to update in the Client the information
-			ClientUpdateAbilityStatus(Info.AbilityTag, FMagicianGameplayTags::Get().Abilities_Status_Eligible);
+			ClientUpdateAbilityStatus(Info.AbilityTag, FMagicianGameplayTags::Get().Abilities_Status_Eligible, 1);
 		}
 	}
+}
+
+void UMagicianAbilitySystemComponent::ServerSpendSpellPoint_Implementation(const FGameplayTag& AbilityTag)
+{
+	FGameplayAbilitySpec* AbilitySpec = GetSpecFromAbilityTag(AbilityTag);
+	if (AbilitySpec == nullptr) return;
+
+	if(GetAvatarActor()->Implements<UPlayerInterface>())
+	{
+		IPlayerInterface::Execute_AddSpellPoints(GetAvatarActor(), -1);
+	}
+
+	const FMagicianGameplayTags GameplayTags = FMagicianGameplayTags::Get();
+	FGameplayTag StatusTag = GetStatusFromSpec(*AbilitySpec);
+
+	if (StatusTag.MatchesTagExact(GameplayTags.Abilities_Status_Eligible))
+	{
+		AbilitySpec->DynamicAbilityTags.RemoveTag(GameplayTags.Abilities_Status_Eligible);
+		AbilitySpec->DynamicAbilityTags.AddTag(GameplayTags.Abilities_Status_Unlocked);
+		StatusTag = GameplayTags.Abilities_Status_Unlocked;
+	}
+	else if (StatusTag.MatchesTagExact(GameplayTags.Abilities_Status_Equipped) || StatusTag.MatchesTagExact(GameplayTags.Abilities_Status_Unlocked))
+	{
+		AbilitySpec->Level += 1;
+	}
+
+	ClientUpdateAbilityStatus(AbilityTag, StatusTag, AbilitySpec->Level);
+	MarkAbilitySpecDirty(*AbilitySpec);
 }
 
 void UMagicianAbilitySystemComponent::ServerUpgradeAttribute_Implementation(const FGameplayTag& AttributeTag)
@@ -200,9 +228,9 @@ FGameplayTag UMagicianAbilitySystemComponent::GetStatusFromSpec(const FGameplayA
 	return FGameplayTag();
 }
 
-void UMagicianAbilitySystemComponent::ClientUpdateAbilityStatus_Implementation(const FGameplayTag& AbilityTag, const FGameplayTag& StatusTag)
+void UMagicianAbilitySystemComponent::ClientUpdateAbilityStatus_Implementation(const FGameplayTag& AbilityTag, const FGameplayTag& StatusTag, int32 AbilityLevel)
 {
-	AbilityStatusDelegate.Broadcast(AbilityTag, StatusTag);
+	AbilityStatusDelegate.Broadcast(AbilityTag, StatusTag, AbilityLevel);
 }
 
 void UMagicianAbilitySystemComponent::OnRep_ActivateAbilities()

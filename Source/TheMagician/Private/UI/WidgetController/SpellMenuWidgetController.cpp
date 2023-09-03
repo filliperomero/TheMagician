@@ -17,7 +17,7 @@ void USpellMenuWidgetController::BroadcastInitialValues()
 void USpellMenuWidgetController::BindCallbacksToDependencies()
 {
 	GetMagicianASC()->AbilityStatusDelegate.AddLambda(
-	[this](const FGameplayTag& AbilityTag, const FGameplayTag& StatusTag)
+	[this](const FGameplayTag& AbilityTag, const FGameplayTag& StatusTag, int32 NewLevel)
 		{
 			if (SelectedAbility.AbilityTag.MatchesTagExact(AbilityTag))
 			{
@@ -78,6 +78,14 @@ void USpellMenuWidgetController::SpellGlobeSelected(const FGameplayTag& AbilityT
 
 	ShouldEnableButtons(AbilityStatus, SpellPoints, bEnableSpendPoints, bEnableEquip);
 	SpellGlobeSelectedDelegate.Broadcast(bEnableSpendPoints, bEnableEquip);
+}
+
+void USpellMenuWidgetController::SpendPointButtonPressed()
+{
+	if (GetMagicianASC() == nullptr) return;
+
+	// Call Server RPC so this just happens in the Server since spending points should only happens in the server
+	GetMagicianASC()->ServerSpendSpellPoint(SelectedAbility.AbilityTag);
 }
 
 void USpellMenuWidgetController::ShouldEnableButtons(const FGameplayTag& AbilityStatus, int32 SpellPoints, bool& bShouldEnableSpendPointsButton, bool& bShouldEnableEquipButton)
