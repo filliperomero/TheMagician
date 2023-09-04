@@ -126,6 +126,25 @@ void UMagicianAbilitySystemComponent::UpdateAbilityStatuses(int32 Level)
 	}
 }
 
+bool UMagicianAbilitySystemComponent::GetDescriptionsByAbilityTag(const FGameplayTag& AbilityTag, FString& OutDescription, FString& OutNextLevelDescription)
+{
+	if (const FGameplayAbilitySpec* AbilitySpec = GetSpecFromAbilityTag(AbilityTag))
+	{
+		if (UMagicianGameplayAbility* MagicianAbility = Cast<UMagicianGameplayAbility>(AbilitySpec->Ability))
+		{
+			OutDescription = MagicianAbility->GetDescription(AbilitySpec->Level);
+			OutNextLevelDescription = MagicianAbility->GetNextLevelDescription(AbilitySpec->Level + 1);
+			
+			return true;
+		}
+	}
+
+	const UAbilityInfo* AbilityInfo = UMagicianAbilitySystemLibrary::GetAbilityInfo(GetAvatarActor());
+	OutDescription = UMagicianGameplayAbility::GetLockedDescription(AbilityInfo->FindAbilityInfoByTag(AbilityTag).LevelRequirement);
+	OutNextLevelDescription = FString();
+	return false;
+}
+
 void UMagicianAbilitySystemComponent::ServerSpendSpellPoint_Implementation(const FGameplayTag& AbilityTag)
 {
 	FGameplayAbilitySpec* AbilitySpec = GetSpecFromAbilityTag(AbilityTag);
