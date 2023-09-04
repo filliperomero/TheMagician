@@ -97,6 +97,14 @@ void USpellMenuWidgetController::SpendPointButtonPressed()
 	GetMagicianASC()->ServerSpendSpellPoint(SelectedAbility.AbilityTag);
 }
 
+void USpellMenuWidgetController::GlobeDeselect()
+{
+	SelectedAbility.AbilityTag = FMagicianGameplayTags::Get().Abilities_None;
+	SelectedAbility.StatusTag = FMagicianGameplayTags::Get().Abilities_Status_Locked;
+
+	SpellGlobeSelectedDelegate.Broadcast(false, false,FString(), FString());
+}
+
 void USpellMenuWidgetController::ShouldEnableButtons(const FGameplayTag& AbilityStatus, int32 SpellPoints, bool& bShouldEnableSpendPointsButton, bool& bShouldEnableEquipButton)
 {
 	const FMagicianGameplayTags GameplayTags = FMagicianGameplayTags::Get();

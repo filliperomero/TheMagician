@@ -140,7 +140,13 @@ bool UMagicianAbilitySystemComponent::GetDescriptionsByAbilityTag(const FGamepla
 	}
 
 	const UAbilityInfo* AbilityInfo = UMagicianAbilitySystemLibrary::GetAbilityInfo(GetAvatarActor());
-	OutDescription = UMagicianGameplayAbility::GetLockedDescription(AbilityInfo->FindAbilityInfoByTag(AbilityTag).LevelRequirement);
+	if (!AbilityTag.IsValid() || AbilityTag.MatchesTagExact(FMagicianGameplayTags::Get().Abilities_None))
+	{
+		OutDescription = FString();
+	} else
+	{
+		OutDescription = UMagicianGameplayAbility::GetLockedDescription(AbilityInfo->FindAbilityInfoByTag(AbilityTag).LevelRequirement);
+	}
 	OutNextLevelDescription = FString();
 	return false;
 }
