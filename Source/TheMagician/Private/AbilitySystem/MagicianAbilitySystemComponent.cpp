@@ -151,6 +151,73 @@ bool UMagicianAbilitySystemComponent::GetDescriptionsByAbilityTag(const FGamepla
 	return false;
 }
 
+void UMagicianAbilitySystemComponent::ClearSlot(FGameplayAbilitySpec* Spec)
+{
+	const FGameplayTag Slot = GetInputTagFromSpec(*Spec);
+	if (!Slot.IsValid()) return;
+	
+	Spec->DynamicAbilityTags.RemoveTag(Slot);
+	MarkAbilitySpecDirty(*Spec);
+}
+
+void UMagicianAbilitySystemComponent::ClearAbilitiesOfSlot(const FGameplayTag& Slot)
+{
+	if (!Slot.IsValid()) return;
+
+	FScopedAbilityListLock ActiveScopeLock(*this);
+	for (FGameplayAbilitySpec& Spec : GetActivatableAbilities())
+	{
+		if (AbilityHasSlot(&Spec, Slot))
+		{
+			ClearSlot(&Spec);
+		}
+	}
+}
+
+bool UMagicianAbilitySystemComponent::AbilityHasSlot(FGameplayAbilitySpec* Spec, const FGameplayTag& Slot)
+{
+	if (Spec == nullptr || !Slot.IsValid()) return false;
+	
+	for (FGameplayTag Tag : Spec->DynamicAbilityTags)
+	{
+		if (Tag.MatchesTagExact(Slot))
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+void UMagicianAbilitySystemComponent::ServerEquipAbility_Implementation(const FGameplayTag& AbilityTag, const FGameplayTag& SlotTag)
+{
+	if (FGameplayAbilitySpec* AbilitySpec = GetSpecFromAbilityTag(AbilityTag))
+	{
+		const FMagicianGameplayTags& GameplayTags = FMagicianGameplayTags::Get();
+		const FGameplayTag& PrevSlot = GetInputTagFromSpec(*AbilitySpec);
+		const FGameplayTag& StatusTag = GetStatusFromSpec(*AbilitySpec);
+		
+		if (StatusTag.MatchesTagExact(GameplayTags.Abilities_Status_Equipped) || StatusTag.MatchesTagExact(GameplayTags.Abilities_Status_Unlocked))
+		{
+			// Remove this InputTag (SlotTag) from any Ability that has it
+			ClearAbilitiesOfSlot(SlotTag);
+			// Clear this ability Slot, just in case is a different slot
+			ClearSlot(AbilitySpec);
+			// Assign this ability to this slot
+			AbilitySpec->DynamicAbilityTags.AddTag(SlotTag);
+
+			if (StatusTag.MatchesTagExact(GameplayTags.Abilities_Status_Unlocked))
+			{
+				AbilitySpec->DynamicAbilityTags.RemoveTag(GameplayTags.Abilities_Status_Unlocked);
+				AbilitySpec->DynamicAbilityTags.AddTag(GameplayTags.Abilities_Status_Equipped);
+			}
+			MarkAbilitySpecDirty(*AbilitySpec);
+
+			ClientEquipAbility(AbilityTag, GameplayTags.Abilities_Status_Equipped, SlotTag, PrevSlot);
+		}
+	}
+}
+
 void UMagicianAbilitySystemComponent::ServerSpendSpellPoint_Implementation(const FGameplayTag& AbilityTag)
 {
 	FGameplayAbilitySpec* AbilitySpec = GetSpecFromAbilityTag(AbilityTag);
@@ -201,14 +268,31 @@ FGameplayAbilitySpec* UMagicianAbilitySystemComponent::GetSpecFromAbilityTag(con
 	{
 		for (FGameplayTag Tag : AbilitySpec.Ability.Get()->AbilityTags)
 		{
-			if (Tag.MatchesTag(AbilityTag))
-			{
-				return &AbilitySpec;
-			}
+			if (Tag.MatchesTag(AbilityTag)) return &AbilitySpec;
 		}
 	}
 
 	return nullptr;
+}
+
+FGameplayTag UMagicianAbilitySystemComponent::GetStatusFromAbilityTag(const FGameplayTag& AbilityTag)
+{
+	if (const FGameplayAbilitySpec* Spec = GetSpecFromAbilityTag(AbilityTag))
+	{
+		return GetStatusFromSpec(*Spec);
+	}
+
+	return FGameplayTag();
+}
+
+FGameplayTag UMagicianAbilitySystemComponent::GetInputTagFromAbilityTag(const FGameplayTag& AbilityTag)
+{
+	if (const FGameplayAbilitySpec* Spec = GetSpecFromAbilityTag(AbilityTag))
+	{
+		return GetInputTagFromSpec(*Spec);
+	}
+
+	return FGameplayTag();
 }
 
 FGameplayTag UMagicianAbilitySystemComponent::GetAbilityTagFromSpec(const FGameplayAbilitySpec& AbilitySpec)
@@ -256,6 +340,11 @@ FGameplayTag UMagicianAbilitySystemComponent::GetStatusFromSpec(const FGameplayA
 void UMagicianAbilitySystemComponent::ClientUpdateAbilityStatus_Implementation(const FGameplayTag& AbilityTag, const FGameplayTag& StatusTag, int32 AbilityLevel)
 {
 	AbilityStatusDelegate.Broadcast(AbilityTag, StatusTag, AbilityLevel);
+}
+
+void UMagicianAbilitySystemComponent::ClientEquipAbility_Implementation(const FGameplayTag& AbilityTag, const FGameplayTag& StatusTag, const FGameplayTag& SlotTag, const FGameplayTag& PrevSlotTag)
+{
+	AbilityEquippedDelegate.Broadcast(AbilityTag, StatusTag, SlotTag, PrevSlotTag);
 }
 
 void UMagicianAbilitySystemComponent::OnRep_ActivateAbilities()

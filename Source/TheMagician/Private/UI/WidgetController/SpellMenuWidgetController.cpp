@@ -42,6 +42,8 @@ void USpellMenuWidgetController::BindCallbacksToDependencies()
 		}
 	);
 
+	GetMagicianASC()->AbilityEquippedDelegate.AddUObject(this, &ThisClass::OnAbilityEquipped);
+
 	GetMagicianPS()->OnSpellPointsChangedDelegate.AddLambda(
 		[this](int32 Points)
 		{
@@ -63,7 +65,7 @@ void USpellMenuWidgetController::SpellGlobeSelected(const FGameplayTag& AbilityT
 {
 	if (bWaitingForEquipSelection)
 	{
-		FMagicianAbilityInfo Info = AbilityInfo->FindAbilityInfoByTag(AbilityTag);
+		const FMagicianAbilityInfo Info = AbilityInfo->FindAbilityInfoByTag(AbilityTag);
 		StopWaitingForEquipSelectionDelegate.Broadcast(Info.AbilityTypeTag);
 		bWaitingForEquipSelection = false;
 	}
@@ -108,7 +110,7 @@ void USpellMenuWidgetController::GlobeDeselect()
 {
 	if (bWaitingForEquipSelection)
 	{
-		FMagicianAbilityInfo Info = AbilityInfo->FindAbilityInfoByTag(SelectedAbility.AbilityTag);
+		const FMagicianAbilityInfo Info = AbilityInfo->FindAbilityInfoByTag(SelectedAbility.AbilityTag);
 		StopWaitingForEquipSelectionDelegate.Broadcast(Info.AbilityTypeTag);
 		bWaitingForEquipSelection = false;
 	}
@@ -121,10 +123,47 @@ void USpellMenuWidgetController::GlobeDeselect()
 
 void USpellMenuWidgetController::EquipButtonPressed()
 {
-	FMagicianAbilityInfo Info = AbilityInfo->FindAbilityInfoByTag(SelectedAbility.AbilityTag);
+	const FMagicianAbilityInfo Info = AbilityInfo->FindAbilityInfoByTag(SelectedAbility.AbilityTag);
 
 	WaitForEquipSelectionDelegate.Broadcast(Info.AbilityTypeTag);
 	bWaitingForEquipSelection = true;
+
+	const FGameplayTag SelectedStatus = GetMagicianASC()->GetStatusFromAbilityTag(SelectedAbility.AbilityTag);
+	if (SelectedStatus.MatchesTagExact(FMagicianGameplayTags::Get().Abilities_Status_Equipped))
+	{
+		SelectedSlot = GetMagicianASC()->GetInputTagFromAbilityTag(SelectedAbility.AbilityTag);
+	}
+}
+
+void USpellMenuWidgetController::SpellRowGlobePressed(const FGameplayTag& SlotTag, const FGameplayTag& AbilityTypeTag)
+{
+	if (!bWaitingForEquipSelection || !SelectedAbility.AbilityTag.IsValid()) return;
+	// Check Selected Ability against the slot's ability type. (don't equip an offensive spell in a passive slot and vice versa)
+	const FGameplayTag SelectedAbilityType = AbilityInfo->FindAbilityInfoByTag(SelectedAbility.AbilityTag).AbilityTypeTag;
+	if (!SelectedAbilityType.MatchesTagExact(AbilityTypeTag)) return;
+
+	GetMagicianASC()->ServerEquipAbility(SelectedAbility.AbilityTag, SlotTag);
+}
+
+void USpellMenuWidgetController::OnAbilityEquipped(const FGameplayTag& AbilityTag, const FGameplayTag& StatusTag, const FGameplayTag& SlotTag, const FGameplayTag& PrevSlotTag)
+{
+	bWaitingForEquipSelection = false;
+
+	const FMagicianGameplayTags GameplayTags = FMagicianGameplayTags::Get();
+
+	FMagicianAbilityInfo LastSlotInfo;
+	LastSlotInfo.StatusTag = GameplayTags.Abilities_Status_Unlocked;
+	LastSlotInfo.InputTag = PrevSlotTag;
+	LastSlotInfo.AbilityTag = GameplayTags.Abilities_None;
+	// Broadcast empty info if PrevSlotTag is a valid slot. Only if equipping on already-equipped spell
+	AbilityInfoDelegate.Broadcast(LastSlotInfo);
+
+	FMagicianAbilityInfo Info = AbilityInfo->FindAbilityInfoByTag(AbilityTag);
+	Info.StatusTag = StatusTag;
+	Info.InputTag = SlotTag;
+	AbilityInfoDelegate.Broadcast(Info);
+	
+	StopWaitingForEquipSelectionDelegate.Broadcast(Info.AbilityTypeTag);
 }
 
 void USpellMenuWidgetController::ShouldEnableButtons(const FGameplayTag& AbilityStatus, int32 SpellPoints, bool& bShouldEnableSpendPointsButton, bool& bShouldEnableEquipButton)

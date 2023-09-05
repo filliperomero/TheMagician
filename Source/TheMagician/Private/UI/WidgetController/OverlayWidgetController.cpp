@@ -3,6 +3,7 @@
 
 #include "UI/WidgetController/OverlayWidgetController.h"
 
+#include "MagicianGameplayTags.h"
 #include "AbilitySystem/MagicianAbilitySystemComponent.h"
 #include "AbilitySystem/MagicianAttributeSet.h"
 #include "AbilitySystem/Data/AbilityInfo.h"
@@ -76,18 +77,22 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 			}
 		}
 	);
-	
-	/**
-	 * We're not directly binding because there is a chance we bind to the delegate when the abilities has been given already, which would be too late.
-	 * So if this case is true, we just call BroadcastAbilityInfo directly, otherwise we bind to the delegate 
-	 */
-	if (GetMagicianASC()->bStartupAbilitiesGiven)
+
+	if (GetMagicianASC())
 	{
-		BroadcastAbilityInfo();
-	}
-	else
-	{
-		GetMagicianASC()->AbilitiesGivenDelegate.AddUObject(this, &ThisClass::BroadcastAbilityInfo);
+		GetMagicianASC()->AbilityEquippedDelegate.AddUObject(this, &ThisClass::OnAbilityEquipped);
+		/**
+		 * We're not directly binding because there is a chance we bind to the delegate when the abilities has been given already, which would be too late.
+		 * So if this case is true, we just call BroadcastAbilityInfo directly, otherwise we bind to the delegate 
+		 */
+		if (GetMagicianASC()->bStartupAbilitiesGiven)
+		{
+			BroadcastAbilityInfo();
+		}
+		else
+		{
+			GetMagicianASC()->AbilitiesGivenDelegate.AddUObject(this, &ThisClass::BroadcastAbilityInfo);
+		}
 	}
 }
 
@@ -113,4 +118,21 @@ void UOverlayWidgetController::OnXPChanged(int32 NewXP)
 
 		OnXPPercentChangedDelegate.Broadcast(XPBarPercent);
 	} 
+}
+
+void UOverlayWidgetController::OnAbilityEquipped(const FGameplayTag& AbilityTag, const FGameplayTag& StatusTag, const FGameplayTag& SlotTag, const FGameplayTag& PrevSlotTag) const
+{
+	const FMagicianGameplayTags GameplayTags = FMagicianGameplayTags::Get();
+
+	FMagicianAbilityInfo LastSlotInfo;
+	LastSlotInfo.StatusTag = GameplayTags.Abilities_Status_Unlocked;
+	LastSlotInfo.InputTag = PrevSlotTag;
+	LastSlotInfo.AbilityTag = GameplayTags.Abilities_None;
+	// Broadcast empty info if PrevSlotTag is a valid slot. Only if equipping on already-equipped spell
+	AbilityInfoDelegate.Broadcast(LastSlotInfo);
+
+	FMagicianAbilityInfo Info = AbilityInfo->FindAbilityInfoByTag(AbilityTag);
+	Info.StatusTag = StatusTag;
+	Info.InputTag = SlotTag;
+	AbilityInfoDelegate.Broadcast(Info);
 }

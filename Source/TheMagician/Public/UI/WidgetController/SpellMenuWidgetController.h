@@ -51,11 +51,17 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void EquipButtonPressed();
 
+	UFUNCTION(BlueprintCallable)
+	void SpellRowGlobePressed(const FGameplayTag& SlotTag, const FGameplayTag& AbilityTypeTag);
+
+	void OnAbilityEquipped(const FGameplayTag& AbilityTag, const FGameplayTag& StatusTag, const FGameplayTag& SlotTag, const FGameplayTag& PrevSlotTag);
+
 private:
 	static void ShouldEnableButtons(const FGameplayTag& AbilityStatus, int32 SpellPoints, bool& bShouldEnableSpendPointsButton, bool& bShouldEnableEquipButton);
 
 	FSelectedAbility SelectedAbility = { FMagicianGameplayTags::Get().Abilities_None, FMagicianGameplayTags::Get().Abilities_Status_Locked };
 	int32 CurrentSpellPoints { 0 };
 	bool bWaitingForEquipSelection { false };
+	FGameplayTag SelectedSlot { FGameplayTag() };
 	
 };
