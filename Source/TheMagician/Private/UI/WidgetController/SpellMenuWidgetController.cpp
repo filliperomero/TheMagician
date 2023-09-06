@@ -65,7 +65,7 @@ void USpellMenuWidgetController::SpellGlobeSelected(const FGameplayTag& AbilityT
 {
 	if (bWaitingForEquipSelection)
 	{
-		const FMagicianAbilityInfo Info = AbilityInfo->FindAbilityInfoByTag(AbilityTag);
+		const FMagicianAbilityInfo Info = AbilityInfo->FindAbilityInfoByTag(SelectedAbility.AbilityTag);
 		StopWaitingForEquipSelectionDelegate.Broadcast(Info.AbilityTypeTag);
 		bWaitingForEquipSelection = false;
 	}
