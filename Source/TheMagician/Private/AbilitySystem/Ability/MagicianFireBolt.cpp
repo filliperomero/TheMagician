@@ -2,11 +2,10 @@
 
 
 #include "AbilitySystem/Ability/MagicianFireBolt.h"
-#include "MagicianGameplayTags.h"
 
 FString UMagicianFireBolt::GetDescription(int32 Level)
 {
-	const int32 Damage = GetDamageByDamageType(Level, FMagicianGameplayTags::Get().Damage_Fire);
+	const int32 ScaledDamage = Damage.GetValueAtLevel(Level);
 	const float ManaCost = GetManaCost(Level);
 	const float Cooldown = GetCooldown(Level);
 	
@@ -25,7 +24,7 @@ FString UMagicianFireBolt::GetDescription(int32 Level)
 			Level,
 			ManaCost,
 			Cooldown,
-			Damage
+			ScaledDamage
 		);
 	}
 
@@ -43,13 +42,13 @@ FString UMagicianFireBolt::GetDescription(int32 Level)
 		ManaCost,
 		Cooldown,
 		FMath::Min(Level, NumProjectiles),
-		Damage
+		ScaledDamage
 	);
 }
 
 FString UMagicianFireBolt::GetNextLevelDescription(int32 Level)
 {
-	const int32 Damage = GetDamageByDamageType(Level, FMagicianGameplayTags::Get().Damage_Fire);
+	const int32 ScaledDamage = Damage.GetValueAtLevel(Level);
 	const float ManaCost = GetManaCost(Level);
 	const float Cooldown = GetCooldown(Level);
 	
@@ -67,6 +66,6 @@ FString UMagicianFireBolt::GetNextLevelDescription(int32 Level)
 		ManaCost,
 		Cooldown,
 		FMath::Min(Level, NumProjectiles),
-		Damage
+		ScaledDamage
 	);
 }

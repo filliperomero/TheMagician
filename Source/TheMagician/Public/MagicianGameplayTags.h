@@ -61,6 +61,15 @@ public:
 	FGameplayTag Damage_Physical;
 	
 	TMap<FGameplayTag, FGameplayTag> DamageTypesToResistances;
+
+	/** Debuffs */
+	
+	FGameplayTag Debuff_Burn;
+	FGameplayTag Debuff_Stun;
+	FGameplayTag Debuff_Arcane;
+	FGameplayTag Debuff_Physical;
+
+	TMap<FGameplayTag, FGameplayTag> DamageTypesToDebuffs;
 	
 	/** Effects */
 	FGameplayTag Effects_HitReact;
