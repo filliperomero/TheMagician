@@ -109,7 +109,8 @@ UMagicianAbilitySystemComponent* AMagicianPlayerController::GetASC()
 void AMagicianPlayerController::Move(const FInputActionValue& InputActionValue)
 {
 	const FVector2D InputAxisVector = InputActionValue.Get<FVector2D>();
-	const FRotator Rotation = GetControlRotation();
+	// const FRotator Rotation = GetControlRotation();
+	const FRotator Rotation = FRotator::ZeroRotator; // Since we have a fixed camera, we don't need to take in account the control rotation
 	const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
 
 	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
