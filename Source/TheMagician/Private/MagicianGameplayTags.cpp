@@ -53,6 +53,11 @@ void FMagicianGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Attributes_Resistance_Physical = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Attributes.Resistance.Physical"), FString("Resistance to Physical Damage"));
 
 	/** Debuffs */
+	GameplayTags.Debuff_Info_Chance = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Debuff.Info.Chance"), FString("Debuff Info Chance"));
+	GameplayTags.Debuff_Info_Damage = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Debuff.Info.Damage"), FString("Debuff Info Damage"));
+	GameplayTags.Debuff_Info_Duration = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Debuff.Info.Duration"), FString("Debuff Info Duration"));
+	GameplayTags.Debuff_Info_Frequency = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Debuff.Info.Frequency"), FString("Debuff Info Frequency"));
+	
 	GameplayTags.Debuff_Burn = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Debuff.Burn"), FString("Debuff for Fire Damage"));
 	GameplayTags.Debuff_Stun = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Debuff.Stun"), FString("Debuff for Lightning Damage"));
 	GameplayTags.Debuff_Arcane = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Debuff.Arcane"), FString("Debuff for Arcane Damage"));
