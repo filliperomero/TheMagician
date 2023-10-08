@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "MagicianAbilityTypes.h"
 #include "AbilitySystem/Ability/MagicianGameplayAbility.h"
 #include "Interaction/CombatInterface.h"
 #include "MagicianDamageGameplayAbility.generated.h"
@@ -18,6 +19,8 @@ class THEMAGICIAN_API UMagicianDamageGameplayAbility : public UMagicianGameplayA
 public:
 	UFUNCTION(BlueprintCallable)
 	void CauseDamage(AActor* TargetActor);
+
+	FDamageEffectParams MakeDamageEffectParamsFromClassDefaults(AActor* TargetActor = nullptr) const;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)

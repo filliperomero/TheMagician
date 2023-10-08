@@ -17,6 +17,24 @@ void UMagicianDamageGameplayAbility::CauseDamage(AActor* TargetActor)
 	GetAbilitySystemComponentFromActorInfo()->ApplyGameplayEffectSpecToTarget(*DamageSpecHandle.Data.Get(), UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor));
 }
 
+FDamageEffectParams UMagicianDamageGameplayAbility::MakeDamageEffectParamsFromClassDefaults(AActor* TargetActor) const
+{
+	FDamageEffectParams DamageEffectParams;
+	DamageEffectParams.WorldContextObj = GetAvatarActorFromActorInfo();
+	DamageEffectParams.DamageGameplayEffectClass = DamageEffectClass;
+	DamageEffectParams.SourceAbilitySystemComponent = GetAbilitySystemComponentFromActorInfo();
+	DamageEffectParams.TargetAbilitySystemComponent = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
+	DamageEffectParams.BaseDamage = Damage.GetValueAtLevel(GetAbilityLevel());
+	DamageEffectParams.AbilityLevel = GetAbilityLevel();
+	DamageEffectParams.DamageType = DamageType;
+	DamageEffectParams.DebuffChance = DebuffChance;
+	DamageEffectParams.DebuffDamage = DebuffDamage;
+	DamageEffectParams.DebuffFrequency = DebuffDuration;
+	DamageEffectParams.DebuffDuration = DebuffDuration;
+	
+	return DamageEffectParams;
+}
+
 FTaggedMontage UMagicianDamageGameplayAbility::GetRandomTaggedMontageFromArray(const TArray<FTaggedMontage>& TaggedMontages) const
 {
 	if (TaggedMontages.Num() == 0) return FTaggedMontage();

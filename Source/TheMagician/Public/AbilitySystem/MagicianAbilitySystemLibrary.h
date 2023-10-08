@@ -7,6 +7,7 @@
 #include "Data/CharacterClassInfo.h"
 #include "MagicianAbilitySystemLibrary.generated.h"
 
+struct FDamageEffectParams;
 class UAbilityInfo;
 class USpellMenuWidgetController;
 struct FGameplayEffectContextHandle;
@@ -66,6 +67,9 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "MagicianAbilitySystemLibrary|GameplayMechanics")
 	static bool IsNotFriend(const AActor* FirstActor, const AActor* SecondActor);
+
+	UFUNCTION(BlueprintPure, Category = "MagicianAbilitySystemLibrary|DamageEffect")
+	static FGameplayEffectContextHandle ApplyDamageEffect(const FDamageEffectParams& DamageEffectParams);
 	
 	static int32 GetXPRewardByClassAndLevel(const UObject* WorldContextObject, ECharacterClass CharacterClass, int32 CharacterLevel);
 };
