@@ -4,7 +4,6 @@
 #include "AbilitySystem/Ability/MagicianProjectileSpell.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
-#include "MagicianGameplayTags.h"
 #include "Actor/MagicianProjectile.h"
 #include "Interaction/CombatInterface.h"
 
@@ -37,28 +36,7 @@ void UMagicianProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLo
 		ESpawnActorCollisionHandlingMethod::AlwaysSpawn
 	);
 	
-	const UAbilitySystemComponent* SourceASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetAvatarActorFromActorInfo());
-	// Set Context information to be used later if needed
-	FGameplayEffectContextHandle EffectContextHandle = SourceASC->MakeEffectContext();
-	EffectContextHandle.SetAbility(this);
-	EffectContextHandle.AddSourceObject(Projectile);
-	TArray<TWeakObjectPtr<AActor>> Actors;
-	Actors.Add(Projectile);
-	EffectContextHandle.AddActors(Actors);
-	FHitResult HitResult;
-	HitResult.Location = ProjectileTargetLocation;
-	EffectContextHandle.AddHitResult(HitResult);
-	
-	const FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), EffectContextHandle);
-
-	// Make use of Set By Caller Magnitude to set the Damage using a specific GameplayTag
-	const FMagicianGameplayTags GameplayTags = FMagicianGameplayTags::Get();
-
-	// Add Damages by Damage Type
-	const float ScaledDamage = Damage.GetValueAtLevel(GetAbilityLevel());
-	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, DamageType, ScaledDamage);
-	
-	Projectile->DamageEffectSpecHandle = SpecHandle;
+	Projectile->DamageEffectParams = MakeDamageEffectParamsFromClassDefaults();
 
 	Projectile->FinishSpawning(SpawnTransform);
 }
