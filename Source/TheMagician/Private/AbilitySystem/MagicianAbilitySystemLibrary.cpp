@@ -172,6 +172,85 @@ void UMagicianAbilitySystemLibrary::SetIsCriticalHit(FGameplayEffectContextHandl
 		MagicianContext->SetIsCriticalHit(bInIsCriticalHit);
 }
 
+bool UMagicianAbilitySystemLibrary::IsSuccessfulDebuff(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FMagicianGameplayEffectContext* MagicianContext = static_cast<const FMagicianGameplayEffectContext*>(EffectContextHandle.Get()))
+		return MagicianContext->IsSuccessfulDebuff();
+
+	return false;
+}
+
+void UMagicianAbilitySystemLibrary::SetIsSuccessfulDebuff(FGameplayEffectContextHandle& EffectContextHandle, bool bInIsDebuff)
+{
+	if (FMagicianGameplayEffectContext* MagicianContext = static_cast<FMagicianGameplayEffectContext*>(EffectContextHandle.Get()))
+		MagicianContext->SetIsSuccessfulDebuff(bInIsDebuff);
+}
+
+float UMagicianAbilitySystemLibrary::GetDebuffDamage(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FMagicianGameplayEffectContext* MagicianContext = static_cast<const FMagicianGameplayEffectContext*>(EffectContextHandle.Get()))
+		return MagicianContext->GetDebuffDamage();
+
+	return 0.f;
+}
+
+void UMagicianAbilitySystemLibrary::SetDebuffDamage(FGameplayEffectContextHandle& EffectContextHandle, float InDamage)
+{
+	if (FMagicianGameplayEffectContext* MagicianContext = static_cast<FMagicianGameplayEffectContext*>(EffectContextHandle.Get()))
+		MagicianContext->SetDebuffDamage(InDamage);
+}
+
+float UMagicianAbilitySystemLibrary::GetDebuffDuration(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FMagicianGameplayEffectContext* MagicianContext = static_cast<const FMagicianGameplayEffectContext*>(EffectContextHandle.Get()))
+		return MagicianContext->GetDebuffDuration();
+
+	return 0.f;
+}
+
+void UMagicianAbilitySystemLibrary::SetDebuffDuration(FGameplayEffectContextHandle& EffectContextHandle, float InDuration)
+{
+	if (FMagicianGameplayEffectContext* MagicianContext = static_cast<FMagicianGameplayEffectContext*>(EffectContextHandle.Get()))
+		MagicianContext->SetDebuffDuration(InDuration);
+}
+
+float UMagicianAbilitySystemLibrary::GetDebuffFrequency(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FMagicianGameplayEffectContext* MagicianContext = static_cast<const FMagicianGameplayEffectContext*>(EffectContextHandle.Get()))
+		return MagicianContext->GetDebuffFrequency();
+
+	return 0.f;
+}
+
+void UMagicianAbilitySystemLibrary::SetDebuffFrequency(FGameplayEffectContextHandle& EffectContextHandle, float InFrequency)
+{
+	if (FMagicianGameplayEffectContext* MagicianContext = static_cast<FMagicianGameplayEffectContext*>(EffectContextHandle.Get()))
+		MagicianContext->SetDebuffFrequency(InFrequency);
+}
+
+FGameplayTag UMagicianAbilitySystemLibrary::GetDamageType(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FMagicianGameplayEffectContext* MagicianContext = static_cast<const FMagicianGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		if (MagicianContext->GetDamageType().IsValid())
+		{
+			return *MagicianContext->GetDamageType();
+		}
+	}
+
+	return FGameplayTag();
+}
+
+void UMagicianAbilitySystemLibrary::SetDamageType(FGameplayEffectContextHandle& EffectContextHandle, const FGameplayTag& InDamageType)
+{
+	if (FMagicianGameplayEffectContext* MagicianContext = static_cast<FMagicianGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		const TSharedPtr<FGameplayTag> DamageType = MakeShared<FGameplayTag>(InDamageType);
+		MagicianContext->SetDamageType(DamageType);
+		
+	}
+}
+
 void UMagicianAbilitySystemLibrary::GetLivePlayersWithinRadius(const UObject* WorldContextObject, TArray<AActor*>& OutOverlappingActors, const TArray<AActor*>& ActorsToIgnore, float Radius, const FVector& SphereOrigin)
 {
 	FCollisionQueryParams SphereParams;
