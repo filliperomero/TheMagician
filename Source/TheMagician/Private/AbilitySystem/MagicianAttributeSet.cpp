@@ -129,76 +129,96 @@ void UMagicianAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCa
 
 	if (Data.EvaluatedData.Attribute == GetIncomingXPAttribute())
 	{
-		const float LocalIncomingXP = GetIncomingXP();
-		SetIncomingXP(0.f);
-
-		// Source Character is the Owner, since GA_ListenForEvents applies GE_EventBasedEffect, adding to IncomingXP
-		if (Props.SourceCharacter->Implements<UPlayerInterface>() && Props.SourceCharacter->Implements<UCombatInterface>())
-		{
-			const int32 CurrentLevel = ICombatInterface::Execute_GetPlayerLevel(Props.SourceCharacter);
-			const int32 CurrentXP = IPlayerInterface::Execute_GetXP(Props.SourceCharacter);
-
-			const int32 NewLevel = IPlayerInterface::Execute_FindLevelForXP(Props.SourceCharacter, CurrentXP + LocalIncomingXP);
-			const int32 NumLevelUps = NewLevel - CurrentLevel;
-
-			if (NumLevelUps > 0)
-			{
-				IPlayerInterface::Execute_AddPlayerLevel(Props.SourceCharacter, NumLevelUps);
-				int32 AttributePointsReward = 0;
-				int32 SpellPointsReward = 0;
-
-				for (int32 i = 0; i < NumLevelUps; i++)
-				{
-					AttributePointsReward += IPlayerInterface::Execute_GetAttributePointsReward(Props.SourceCharacter, CurrentLevel + i);
-					SpellPointsReward += IPlayerInterface::Execute_GetSpellPointsReward(Props.SourceCharacter, CurrentLevel + i);
-				}
-				
-				IPlayerInterface::Execute_AddAttributePoints(Props.SourceCharacter, AttributePointsReward);
-				IPlayerInterface::Execute_AddSpellPoints(Props.SourceCharacter, SpellPointsReward);
-
-				bTopOffHealth = true;
-				bTopOffMana = true;
-
-				IPlayerInterface::Execute_LevelUp(Props.SourceCharacter);
-			}
-			
-			IPlayerInterface::Execute_AddToXP(Props.SourceCharacter, LocalIncomingXP);
-		}
+		HandleIncomingXP(Props);
 	}
 
 	if (Data.EvaluatedData.Attribute == GetIncomingDamageAttribute())
 	{
-		const float LocalIncomingDamage = GetIncomingDamage();
-		SetIncomingDamage(0.f);
+		HandleIncomingDamage(Props);
+	}
+}
+
+void UMagicianAttributeSet::HandleIncomingDamage(const FEffectProperties& Props)
+{
+	const float LocalIncomingDamage = GetIncomingDamage();
+	SetIncomingDamage(0.f);
 		
-		if (LocalIncomingDamage > 0.f)
+	if (LocalIncomingDamage > 0.f)
+	{
+		const float NewHealth = GetHealth() - LocalIncomingDamage;
+		SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
+
+		const bool bIsFatal = NewHealth <= 0.f;
+
+		if (bIsFatal)
 		{
-			const float NewHealth = GetHealth() - LocalIncomingDamage;
-			SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
-
-			const bool bIsFatal = NewHealth <= 0.f;
-
-			if (bIsFatal)
+			if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(Props.TargetAvatarActor))
 			{
-				if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(Props.TargetAvatarActor))
-				{
-					CombatInterface->Die();
-				}
+				CombatInterface->Die();
+			}
 
-				SendXPEvent(Props);
-			}
-			else
-			{
-				FGameplayTagContainer TagContainer;
-				TagContainer.AddTag(FMagicianGameplayTags::Get().Effects_HitReact);
-				
-				Props.TargetASC->TryActivateAbilitiesByTag(TagContainer);
-			}
-			
-			const bool bBlock = UMagicianAbilitySystemLibrary::IsBlockedHit(Props.EffectContextHandle);
-			const bool bCriticalHit = UMagicianAbilitySystemLibrary::IsCriticalHit(Props.EffectContextHandle);
-			ShowFloatingText(Props, LocalIncomingDamage, bBlock, bCriticalHit);
+			SendXPEvent(Props);
 		}
+		else
+		{
+			FGameplayTagContainer TagContainer;
+			TagContainer.AddTag(FMagicianGameplayTags::Get().Effects_HitReact);
+				
+			Props.TargetASC->TryActivateAbilitiesByTag(TagContainer);
+		}
+			
+		const bool bBlock = UMagicianAbilitySystemLibrary::IsBlockedHit(Props.EffectContextHandle);
+		const bool bCriticalHit = UMagicianAbilitySystemLibrary::IsCriticalHit(Props.EffectContextHandle);
+		ShowFloatingText(Props, LocalIncomingDamage, bBlock, bCriticalHit);
+
+		if (UMagicianAbilitySystemLibrary::IsSuccessfulDebuff(Props.EffectContextHandle))
+		{
+			HandleDebuff(Props);
+		}
+	}
+}
+
+void UMagicianAttributeSet::HandleDebuff(const FEffectProperties& Props)
+{
+	// Handle Debuff
+}
+
+void UMagicianAttributeSet::HandleIncomingXP(const FEffectProperties& Props)
+{
+	const float LocalIncomingXP = GetIncomingXP();
+	SetIncomingXP(0.f);
+
+	// Source Character is the Owner, since GA_ListenForEvents applies GE_EventBasedEffect, adding to IncomingXP
+	if (Props.SourceCharacter->Implements<UPlayerInterface>() && Props.SourceCharacter->Implements<UCombatInterface>())
+	{
+		const int32 CurrentLevel = ICombatInterface::Execute_GetPlayerLevel(Props.SourceCharacter);
+		const int32 CurrentXP = IPlayerInterface::Execute_GetXP(Props.SourceCharacter);
+
+		const int32 NewLevel = IPlayerInterface::Execute_FindLevelForXP(Props.SourceCharacter, CurrentXP + LocalIncomingXP);
+		const int32 NumLevelUps = NewLevel - CurrentLevel;
+
+		if (NumLevelUps > 0)
+		{
+			IPlayerInterface::Execute_AddPlayerLevel(Props.SourceCharacter, NumLevelUps);
+			int32 AttributePointsReward = 0;
+			int32 SpellPointsReward = 0;
+
+			for (int32 i = 0; i < NumLevelUps; i++)
+			{
+				AttributePointsReward += IPlayerInterface::Execute_GetAttributePointsReward(Props.SourceCharacter, CurrentLevel + i);
+				SpellPointsReward += IPlayerInterface::Execute_GetSpellPointsReward(Props.SourceCharacter, CurrentLevel + i);
+			}
+				
+			IPlayerInterface::Execute_AddAttributePoints(Props.SourceCharacter, AttributePointsReward);
+			IPlayerInterface::Execute_AddSpellPoints(Props.SourceCharacter, SpellPointsReward);
+
+			bTopOffHealth = true;
+			bTopOffMana = true;
+
+			IPlayerInterface::Execute_LevelUp(Props.SourceCharacter);
+		}
+			
+		IPlayerInterface::Execute_AddToXP(Props.SourceCharacter, LocalIncomingXP);
 	}
 }
 

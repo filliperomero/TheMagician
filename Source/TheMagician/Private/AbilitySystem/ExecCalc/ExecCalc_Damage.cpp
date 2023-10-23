@@ -71,7 +71,7 @@ void UExecCalc_Damage::DetermineDebuff(const FGameplayEffectCustomExecutionParam
 		const FGameplayTag& DamageType = Pair.Key;
 		const FGameplayTag& DebuffType = Pair.Value;
 		// Here we're assuming we'll not have negative damage. If we do, we need to change the approach here
-		float DamageTypeValue = Spec.GetSetByCallerMagnitude(DamageType,false, -1.f);
+		const float DamageTypeValue = Spec.GetSetByCallerMagnitude(DamageType,false, -1.f);
 
 		if (DamageTypeValue > -.5f) // .5 padding for floating point [im]precision
 		{
@@ -87,7 +87,18 @@ void UExecCalc_Damage::DetermineDebuff(const FGameplayEffectCustomExecutionParam
 
 			if (bDebuff)
 			{
-				// TODO: 
+				FGameplayEffectContextHandle ContextHandle = Spec.GetContext();
+
+				UMagicianAbilitySystemLibrary::SetIsSuccessfulDebuff(ContextHandle, true);
+				UMagicianAbilitySystemLibrary::SetDamageType(ContextHandle, DamageType);
+
+				const float DebuffDamage = Spec.GetSetByCallerMagnitude(GameplayTags.Debuff_Info_Damage, false, -1.f);
+				const float DebuffDuration = Spec.GetSetByCallerMagnitude(GameplayTags.Debuff_Info_Duration, false, -1.f);
+				const float DebuffFrequency = Spec.GetSetByCallerMagnitude(GameplayTags.Debuff_Info_Frequency, false, -1.f);
+
+				UMagicianAbilitySystemLibrary::SetDebuffDamage(ContextHandle, DebuffDamage);
+				UMagicianAbilitySystemLibrary::SetDebuffDuration(ContextHandle, DebuffDuration);
+				UMagicianAbilitySystemLibrary::SetDebuffFrequency(ContextHandle, DebuffFrequency);
 			}
 		}
 	}
