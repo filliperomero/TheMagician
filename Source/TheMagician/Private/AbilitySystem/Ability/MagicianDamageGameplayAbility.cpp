@@ -29,7 +29,7 @@ FDamageEffectParams UMagicianDamageGameplayAbility::MakeDamageEffectParamsFromCl
 	DamageEffectParams.DamageType = DamageType;
 	DamageEffectParams.DebuffChance = DebuffChance;
 	DamageEffectParams.DebuffDamage = DebuffDamage;
-	DamageEffectParams.DebuffFrequency = DebuffDuration;
+	DamageEffectParams.DebuffFrequency = DebuffFrequency;
 	DamageEffectParams.DebuffDuration = DebuffDuration;
 	
 	return DamageEffectParams;
