@@ -1,3 +1,5 @@
+<a name="readme-top"></a>
+
 <div align="center">
   <h1 align="center">The Magician</h1>
   <p align="center">
