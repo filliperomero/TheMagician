@@ -1,10 +1,5 @@
 <div align="center">
-  <!-- <a href="https://github.com/filliperomero/TheMagician">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
-  </a> -->
-
-<h3 align="center">The Magician</h3>
-
+  <h1 align="center">The Magician</h1>
   <p align="center">
     A Top Down Multiplayer RPG Game with a variety of abilities (offensive & defensive) and attributes to choose from, enemies to defeat, items to pickup and much more! Heavily architected using Unreal Engine's built-in Gameplay Ability System (GAS) and the best coding practices.
   </p>
