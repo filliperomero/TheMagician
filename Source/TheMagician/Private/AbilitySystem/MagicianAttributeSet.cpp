@@ -4,6 +4,7 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "GameplayEffectExtension.h"
+#include "MagicianAbilityTypes.h"
 #include "MagicianGameplayTags.h"
 #include "AbilitySystem/MagicianAbilitySystemLibrary.h"
 #include "GameFramework/Character.h"
@@ -121,6 +122,9 @@ void UMagicianAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCa
 	FEffectProperties Props;
 	SetEffectProperties(Data, Props);
 
+	if (Props.TargetCharacter->Implements<UCombatInterface>() && ICombatInterface::Execute_IsDead(Props.TargetCharacter))
+		return;
+
 	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
 		SetHealth(FMath::Clamp(GetHealth(), 0.f, GetMaxHealth()));
 	
@@ -180,7 +184,41 @@ void UMagicianAttributeSet::HandleIncomingDamage(const FEffectProperties& Props)
 
 void UMagicianAttributeSet::HandleDebuff(const FEffectProperties& Props)
 {
-	// Handle Debuff
+	const FMagicianGameplayTags& GameplayTags = FMagicianGameplayTags::Get();
+	FGameplayEffectContextHandle EffectContext = Props.SourceASC->MakeEffectContext();
+	EffectContext.AddSourceObject(Props.SourceAvatarActor);
+
+	const FGameplayTag DamageType = UMagicianAbilitySystemLibrary::GetDamageType(Props.EffectContextHandle);
+	const float DebuffDamage = UMagicianAbilitySystemLibrary::GetDebuffDamage(Props.EffectContextHandle);
+	const float DebuffDuration = UMagicianAbilitySystemLibrary::GetDebuffDuration(Props.EffectContextHandle);
+	const float DebuffFrequency = UMagicianAbilitySystemLibrary::GetDebuffFrequency(Props.EffectContextHandle);
+	
+	const FString DebuffName = FString::Printf(TEXT("DynamicDebuff_%s"), *DamageType.ToString());
+	
+	// Dynamic Gameplay Effects are NOT supported for replication. So we need to do in the server only
+	UGameplayEffect* Effect = NewObject<UGameplayEffect>(GetTransientPackage(), FName(DebuffName));
+	Effect->DurationPolicy = EGameplayEffectDurationType::HasDuration;
+	Effect->Period = DebuffFrequency;
+	Effect->DurationMagnitude = FScalableFloat(DebuffDuration);
+	Effect->InheritableOwnedTagsContainer.AddTag(GameplayTags.DamageTypesToDebuffs[DamageType]);
+	Effect->StackingType = EGameplayEffectStackingType::AggregateBySource;
+	Effect->StackLimitCount = 1;
+
+	FGameplayModifierInfo ModInfo = FGameplayModifierInfo();
+	ModInfo.ModifierMagnitude = FScalableFloat(DebuffDamage);
+	ModInfo.ModifierOp = EGameplayModOp::Additive;
+	ModInfo.Attribute = GetIncomingDamageAttribute();
+	Effect->Modifiers.Add(ModInfo);
+
+	FGameplayEffectSpec* MutableSpec = new FGameplayEffectSpec(Effect, EffectContext, 1.f);
+	if (MutableSpec)
+	{
+		FMagicianGameplayEffectContext* MagicianContext = static_cast<FMagicianGameplayEffectContext*>(MutableSpec->GetContext().Get());
+		const TSharedPtr<FGameplayTag> DebuffDamageType = MakeShareable(new FGameplayTag(DamageType));
+		MagicianContext->SetDamageType(DebuffDamageType);
+
+		Props.TargetASC->ApplyGameplayEffectSpecToSelf(*MutableSpec);
+	}
 }
 
 void UMagicianAttributeSet::HandleIncomingXP(const FEffectProperties& Props)
