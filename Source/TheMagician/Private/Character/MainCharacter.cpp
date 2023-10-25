@@ -57,6 +57,7 @@ void AMainCharacter::InitAbilityActorInfo()
 	
 	AbilitySystemComponent = MagicianPlayerState->GetAbilitySystemComponent();
 	AttributeSet = MagicianPlayerState->GetAttributeSet();
+	OnAscRegistered.Broadcast(AbilitySystemComponent);
 
 	// In multiplayer, the PlayerController will be invalid in other people computers, since I can only get my PlayerController but not others
 	if (AMagicianPlayerController* MagicianPlayerController = Cast<AMagicianPlayerController>(GetController()))

@@ -142,6 +142,8 @@ void AEnemy::InitAbilityActorInfo()
 	Cast<UMagicianAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();
 
 	if (HasAuthority())	InitializeDefaultAttributes();
+
+	OnAscRegistered.Broadcast(AbilitySystemComponent);
 }
 
 void AEnemy::InitializeDefaultAttributes() const

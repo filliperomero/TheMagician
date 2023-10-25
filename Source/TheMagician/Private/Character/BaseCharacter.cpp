@@ -4,6 +4,7 @@
 #include "AbilitySystemComponent.h"
 #include "MagicianGameplayTags.h"
 #include "AbilitySystem/MagicianAbilitySystemComponent.h"
+#include "AbilitySystem/Debuff/DebuffNiagaraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "TheMagician/TheMagician.h"
@@ -11,6 +12,10 @@
 ABaseCharacter::ABaseCharacter()
 {
 	PrimaryActorTick.bCanEverTick = false;
+
+	BurnDebuffComponent = CreateDefaultSubobject<UDebuffNiagaraComponent>("BurnDebuffComponent");
+	BurnDebuffComponent->SetupAttachment(GetRootComponent());
+	BurnDebuffComponent->DebuffTag = FMagicianGameplayTags::Get().Debuff_Burn;
 
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 	GetCapsuleComponent()->SetGenerateOverlapEvents(false);
@@ -31,7 +36,7 @@ void ABaseCharacter::BeginPlay()
 void ABaseCharacter::InitAbilityActorInfo()
 {
 }
-
+ 
 UAbilitySystemComponent* ABaseCharacter::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
@@ -164,6 +169,16 @@ void ABaseCharacter::IncrementMinionCount_Implementation(int32 Amount)
 ECharacterClass ABaseCharacter::GetCharacterClass_Implementation()
 {
 	return CharacterClass;
+}
+
+FOnASCRegistered ABaseCharacter::GetOnASCRegisteredDelegate()
+{
+	return OnAscRegistered;
+}
+
+FOnDeathSignature ABaseCharacter::GetOnDeathDelegate()
+{
+	return OnDeathDelegate;
 }
 
 void ABaseCharacter::Dissolve()

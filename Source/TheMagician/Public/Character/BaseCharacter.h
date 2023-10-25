@@ -8,6 +8,7 @@
 #include "Interaction/CombatInterface.h"
 #include "BaseCharacter.generated.h"
 
+class UDebuffNiagaraComponent;
 class UNiagaraSystem;
 class UGameplayAbility;
 class UGameplayEffect;
@@ -39,6 +40,12 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = Combat)
 	TArray<FTaggedMontage> AttackMontages;
+
+	virtual FOnASCRegistered GetOnASCRegisteredDelegate() override;
+	virtual FOnDeathSignature GetOnDeathDelegate() override;
+
+	FOnASCRegistered OnAscRegistered;
+	FOnDeathSignature OnDeathDelegate;
 	/** End Combat Interface */
 
 	UFUNCTION(NetMulticast, Reliable)
@@ -109,6 +116,9 @@ protected:
 
 	/** Minions */
 	int32 MinionCount { 0 };
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Debuff")
+	TObjectPtr<UDebuffNiagaraComponent> BurnDebuffComponent;
 
 private:
 	UPROPERTY(EditAnywhere, Category = "Abilities")
