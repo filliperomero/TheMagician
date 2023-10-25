@@ -31,6 +31,7 @@ FDamageEffectParams UMagicianDamageGameplayAbility::MakeDamageEffectParamsFromCl
 	DamageEffectParams.DebuffDamage = DebuffDamage;
 	DamageEffectParams.DebuffFrequency = DebuffFrequency;
 	DamageEffectParams.DebuffDuration = DebuffDuration;
+	DamageEffectParams.DeathImpulseMagnitude = DeathImpulseMagnitude;
 	
 	return DamageEffectParams;
 }

@@ -247,7 +247,24 @@ void UMagicianAbilitySystemLibrary::SetDamageType(FGameplayEffectContextHandle& 
 	{
 		const TSharedPtr<FGameplayTag> DamageType = MakeShared<FGameplayTag>(InDamageType);
 		MagicianContext->SetDamageType(DamageType);
-		
+	}
+}
+
+FVector UMagicianAbilitySystemLibrary::GetDeathImpulse(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FMagicianGameplayEffectContext* MagicianContext = static_cast<const FMagicianGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		return MagicianContext->GetDeathImpulse();
+	}
+
+	return FVector::ZeroVector;
+}
+
+void UMagicianAbilitySystemLibrary::SetDeathImpulse(FGameplayEffectContextHandle& EffectContextHandle, const FVector& InImpulse)
+{
+	if (FMagicianGameplayEffectContext* MagicianContext = static_cast<FMagicianGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		MagicianContext->SetDeathImpulse(InImpulse);
 	}
 }
 
@@ -287,6 +304,7 @@ FGameplayEffectContextHandle UMagicianAbilitySystemLibrary::ApplyDamageEffect(co
 	
 	FGameplayEffectContextHandle EffectContextHandle = DamageEffectParams.SourceAbilitySystemComponent->MakeEffectContext();
 	EffectContextHandle.AddSourceObject(SourceAvatarActor);
+	SetDeathImpulse(EffectContextHandle, DamageEffectParams.DeathImpulse);
 	
 	const FGameplayEffectSpecHandle SpecHandle = DamageEffectParams.SourceAbilitySystemComponent->MakeOutgoingSpec(DamageEffectParams.DamageGameplayEffectClass, DamageEffectParams.AbilityLevel, EffectContextHandle);
 

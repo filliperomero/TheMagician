@@ -47,9 +47,12 @@ bool FMagicianGameplayEffectContext::NetSerialize(FArchive& Ar, UPackageMap* Map
 
 		if (DamageType.IsValid())
 			RepBits |= 1 << 13;
+
+		if (!DeathImpulse.IsZero())
+			RepBits |= 1 << 14;
 	}
 
-	Ar.SerializeBits(&RepBits, 14);
+	Ar.SerializeBits(&RepBits, 15);
 
 	if (RepBits & (1 << 0))
 		Ar << Instigator;
@@ -116,6 +119,9 @@ bool FMagicianGameplayEffectContext::NetSerialize(FArchive& Ar, UPackageMap* Map
 		}
 		DamageType->NetSerialize(Ar, Map, bOutSuccess);
 	}
+
+	if (RepBits & (1 << 14))
+		DeathImpulse.NetSerialize(Ar, Map, bOutSuccess);
 
 	if (Ar.IsLoading())
 		AddInstigator(Instigator.Get(), EffectCauser.Get()); // Just to initialize InstigatorAbilitySystemComponent
