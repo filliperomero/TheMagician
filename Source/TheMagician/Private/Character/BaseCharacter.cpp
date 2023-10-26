@@ -47,31 +47,35 @@ UAnimMontage* ABaseCharacter::GetHitReactMontage_Implementation()
 	return HitReactMontage;
 }
 
-void ABaseCharacter::Die()
+void ABaseCharacter::Die(const FVector& DeathImpulse)
 {
 	// Detach will already be replicated
 	Weapon->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld, true));
 	// Multicast to all Clients
-	MulticastHandleDeath();
+	MulticastHandleDeath(DeathImpulse);
 }
 
-void ABaseCharacter::MulticastHandleDeath_Implementation()
+void ABaseCharacter::MulticastHandleDeath_Implementation(const FVector& DeathImpulse)
 {
 	if (DeathSound) UGameplayStatics::PlaySoundAtLocation(this, DeathSound, GetActorLocation(), GetActorRotation());
 	
 	Weapon->SetSimulatePhysics(true);
 	Weapon->SetEnableGravity(true);
 	Weapon->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	Weapon->AddImpulse(DeathImpulse * 0.1f, NAME_None, true);
 
 	GetMesh()->SetSimulatePhysics(true);
 	GetMesh()->SetEnableGravity(true);
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 	GetMesh()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+	GetMesh()->AddImpulse(DeathImpulse, NAME_None, true);
 	
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	Dissolve();
 	bDead = true;
+	BurnDebuffComponent->Deactivate();
+	OnDeathDelegate.Broadcast(this);
 }
 
 void ABaseCharacter::ApplyEffectToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass, float Level) const
@@ -171,12 +175,12 @@ ECharacterClass ABaseCharacter::GetCharacterClass_Implementation()
 	return CharacterClass;
 }
 
-FOnASCRegistered ABaseCharacter::GetOnASCRegisteredDelegate()
+FOnASCRegistered& ABaseCharacter::GetOnASCRegisteredDelegate()
 {
 	return OnAscRegistered;
 }
 
-FOnDeathSignature ABaseCharacter::GetOnDeathDelegate()
+FOnDeathSignature& ABaseCharacter::GetOnDeathDelegate()
 {
 	return OnDeathDelegate;
 }

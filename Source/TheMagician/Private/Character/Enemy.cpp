@@ -51,11 +51,12 @@ void AEnemy::PossessedBy(AController* NewController)
 	MagicianAIController->GetBlackboardComponent()->SetValueAsBool(FName("RangedAttacker"), CharacterClass != ECharacterClass::Warrior);
 }
 
-void AEnemy::Die()
+void AEnemy::Die(const FVector& DeathImpulse)
 {
 	SetLifeSpan(LifeSpan);
 	if (MagicianAIController) MagicianAIController->GetBlackboardComponent()->SetValueAsBool(FName("Dead"), true);
-	Super::Die();
+	
+	Super::Die(DeathImpulse);
 }
 
 void AEnemy::HighlightActor()

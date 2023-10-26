@@ -158,7 +158,7 @@ void UMagicianAttributeSet::HandleIncomingDamage(const FEffectProperties& Props)
 		{
 			if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(Props.TargetAvatarActor))
 			{
-				CombatInterface->Die();
+				CombatInterface->Die(UMagicianAbilitySystemLibrary::GetDeathImpulse(Props.EffectContextHandle));
 			}
 
 			SendXPEvent(Props);
