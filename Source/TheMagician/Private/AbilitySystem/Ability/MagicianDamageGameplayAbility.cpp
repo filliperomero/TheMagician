@@ -32,6 +32,17 @@ FDamageEffectParams UMagicianDamageGameplayAbility::MakeDamageEffectParamsFromCl
 	DamageEffectParams.DebuffFrequency = DebuffFrequency;
 	DamageEffectParams.DebuffDuration = DebuffDuration;
 	DamageEffectParams.DeathImpulseMagnitude = DeathImpulseMagnitude;
+	DamageEffectParams.KnockbackForceMagnitude = KnockbackForceMagnitude;
+	DamageEffectParams.KnockbackForceChance = KnockbackChance;
+
+	if (IsValid(TargetActor))
+	{
+		FRotator Rotation = (TargetActor->GetActorLocation() - GetAvatarActorFromActorInfo()->GetActorLocation()).Rotation();
+		Rotation.Pitch = 45.f;
+		const FVector ToTarget = Rotation.Vector();
+		DamageEffectParams.DeathImpulse = ToTarget * DeathImpulseMagnitude;
+		DamageEffectParams.KnockbackForce = ToTarget * KnockbackForceMagnitude;
+	}
 	
 	return DamageEffectParams;
 }

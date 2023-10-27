@@ -91,6 +91,17 @@ void AMagicianProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedCompone
 		{
 			const FVector DeathImpulse = GetActorForwardVector() * DamageEffectParams.DeathImpulseMagnitude;
 			DamageEffectParams.DeathImpulse = DeathImpulse;
+
+			if (FMath::RandRange(1, 100) < DamageEffectParams.KnockbackForceChance)
+			{
+				FRotator Rotation = GetActorRotation();
+				Rotation.Pitch = 45.f;
+				
+				const FVector KnockbackDirection = Rotation.Vector();
+				const FVector KnockbackForce = KnockbackDirection * DamageEffectParams.KnockbackForceMagnitude;
+				DamageEffectParams.KnockbackForce = KnockbackForce;
+			}
+			
 			DamageEffectParams.TargetAbilitySystemComponent = TargetASC;
 			UMagicianAbilitySystemLibrary::ApplyDamageEffect(DamageEffectParams);
 		}
