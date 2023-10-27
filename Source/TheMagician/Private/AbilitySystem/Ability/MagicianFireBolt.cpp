@@ -2,6 +2,9 @@
 
 
 #include "AbilitySystem/Ability/MagicianFireBolt.h"
+#include "AbilitySystem/MagicianAbilitySystemLibrary.h"
+#include "Actor/MagicianProjectile.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 
 FString UMagicianFireBolt::GetDescription(int32 Level)
 {
@@ -68,4 +71,57 @@ FString UMagicianFireBolt::GetNextLevelDescription(int32 Level)
 		FMath::Min(Level, NumProjectiles),
 		ScaledDamage
 	);
+}
+
+void UMagicianFireBolt::SpawnProjectiles(const FVector& ProjectileTargetLocation, const FGameplayTag& SocketTag, AActor* HomingTarget, float PitchOverride)
+{
+	if (GetAvatarActorFromActorInfo() == nullptr || !GetAvatarActorFromActorInfo()->HasAuthority()) return;
+	
+	const FVector SocketLocation = ICombatInterface::Execute_GetCombatSocketLocation(GetAvatarActorFromActorInfo(), SocketTag);
+	FRotator Rotation = (ProjectileTargetLocation - SocketLocation).Rotation();
+	Rotation.Pitch = PitchOverride;
+
+	const FVector Forward = Rotation.Vector();
+	NumProjectiles = FMath::Min(MaxNumProjectiles, GetAbilityLevel());
+
+	TArray<FRotator> Rotations = UMagicianAbilitySystemLibrary::EvenlySpacedRotators(Forward, FVector::UpVector, ProjectileSpread, NumProjectiles);
+	const bool bHomingToEnemy = bLaunchHomingProjectiles && HomingTarget && HomingTarget->Implements<UCombatInterface>();
+
+	for (const FRotator& Rot : Rotations)
+	{
+		FTransform SpawnTransform;
+		SpawnTransform.SetLocation(SocketLocation);
+		SpawnTransform.SetRotation(Rot.Quaternion());
+		
+		AMagicianProjectile* Projectile = GetWorld()->SpawnActorDeferred<AMagicianProjectile>(
+			ProjectileClass,
+			SpawnTransform,
+			GetOwningActorFromActorInfo(),
+			Cast<APawn>(GetOwningActorFromActorInfo()),
+			ESpawnActorCollisionHandlingMethod::AlwaysSpawn
+		);
+	
+		Projectile->DamageEffectParams = MakeDamageEffectParamsFromClassDefaults();
+
+		if (bLaunchHomingProjectiles)
+		{
+			if (bHomingToEnemy)
+			{
+				Projectile->ProjectileMovement->HomingTargetComponent = HomingTarget->GetRootComponent();
+			}
+			else
+			{
+				// We're not using NewObject directly in HomingTargetComponent because we want it to be GC and because
+				// HomingTargetComponent is a WeakPtr, it will not delete the component for us automatically.
+				Projectile->HomingTargetSceneComponent = NewObject<USceneComponent>(USceneComponent::StaticClass());
+				Projectile->HomingTargetSceneComponent->SetWorldLocation(ProjectileTargetLocation);
+				Projectile->ProjectileMovement->HomingTargetComponent = Projectile->HomingTargetSceneComponent;
+			}
+
+			Projectile->ProjectileMovement->HomingAccelerationMagnitude = FMath::FRandRange(HomingAccelerationMin, HomingAccelerationMax);
+			Projectile->ProjectileMovement->bIsHomingProjectile = bLaunchHomingProjectiles;
+		}
+
+		Projectile->FinishSpawning(SpawnTransform);
+	}
 }
