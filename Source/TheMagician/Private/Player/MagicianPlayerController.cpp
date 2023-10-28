@@ -109,6 +109,11 @@ UMagicianAbilitySystemComponent* AMagicianPlayerController::GetASC()
 
 void AMagicianPlayerController::Move(const FInputActionValue& InputActionValue)
 {
+	if (GetASC() && GetASC()->HasMatchingGameplayTag(FMagicianGameplayTags::Get().Player_Block_InputPressed))
+	{
+		return;
+	}
+	
 	const FVector2D InputAxisVector = InputActionValue.Get<FVector2D>();
 	// const FRotator Rotation = GetControlRotation();
 	const FRotator Rotation = FRotator::ZeroRotator; // Since we have a fixed camera, we don't need to take in account the control rotation
@@ -142,6 +147,15 @@ void AMagicianPlayerController::MoveCamera(const FInputActionValue& InputActionV
 
 void AMagicianPlayerController::CursorTrace()
 {
+	if (GetASC() && GetASC()->HasMatchingGameplayTag(FMagicianGameplayTags::Get().Player_Block_CursorTrace))
+	{
+		if (LastHoveredActor) LastHoveredActor->UnHighlightActor();
+		if (CurrentHoveredActor) CurrentHoveredActor->UnHighlightActor();
+		LastHoveredActor = nullptr;
+		CurrentHoveredActor = nullptr;
+		return;
+	}
+	
 	GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);
 
 	// Didn't hit anything
@@ -159,6 +173,11 @@ void AMagicianPlayerController::CursorTrace()
 
 void AMagicianPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 {
+	if (GetASC() && GetASC()->HasMatchingGameplayTag(FMagicianGameplayTags::Get().Player_Block_InputPressed))
+	{
+		return;
+	}
+	
 	if (InputTag.MatchesTagExact(FMagicianGameplayTags::Get().InputTag_LMB))
 	{
 		bTargeting = CurrentHoveredActor ? true : false;
@@ -170,6 +189,11 @@ void AMagicianPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 
 void AMagicianPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 {
+	if (GetASC() && GetASC()->HasMatchingGameplayTag(FMagicianGameplayTags::Get().Player_Block_InputReleased))
+	{
+		return;
+	}
+	
 	if (!InputTag.MatchesTagExact(FMagicianGameplayTags::Get().InputTag_LMB))
 	{
 		if (GetASC()) GetASC()->AbilityInputTagReleased(InputTag);
@@ -200,8 +224,11 @@ void AMagicianPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 				}
 			}
 
-			if (ClickNiagaraSystem)
-				UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ClickNiagaraSystem, CachedDestination);
+			if (GetASC() && !GetASC()->HasMatchingGameplayTag(FMagicianGameplayTags::Get().Player_Block_InputPressed))
+			{
+				if (ClickNiagaraSystem)
+					UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ClickNiagaraSystem, CachedDestination);
+			}
 		}
 
 		FollowTime = 0.f;
@@ -211,6 +238,11 @@ void AMagicianPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 
 void AMagicianPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 {
+	if (GetASC() && GetASC()->HasMatchingGameplayTag(FMagicianGameplayTags::Get().Player_Block_InputHeld))
+	{
+		return;
+	}
+	
 	if (!InputTag.MatchesTagExact(FMagicianGameplayTags::Get().InputTag_LMB))
 	{
 		if (GetASC()) GetASC()->AbilityInputTagHeld(InputTag);
