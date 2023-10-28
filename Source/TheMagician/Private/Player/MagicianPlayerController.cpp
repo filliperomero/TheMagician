@@ -164,6 +164,8 @@ void AMagicianPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 		bTargeting = CurrentHoveredActor ? true : false;
 		bAutoRunning = false;
 	}
+	
+	if (GetASC()) GetASC()->AbilityInputTagPressed(InputTag);
 }
 
 void AMagicianPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
