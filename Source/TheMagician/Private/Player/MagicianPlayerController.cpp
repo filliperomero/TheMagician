@@ -8,6 +8,7 @@
 #include "MagicianGameplayTags.h"
 #include "NavigationPath.h"
 #include "NavigationSystem.h"
+#include "NiagaraFunctionLibrary.h"
 #include "AbilitySystem/MagicianAbilitySystemComponent.h"
 #include "Character/MainCharacter.h"
 #include "Components/SplineComponent.h"
@@ -196,6 +197,9 @@ void AMagicianPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 					bAutoRunning = true;
 				}
 			}
+
+			if (ClickNiagaraSystem)
+				UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ClickNiagaraSystem, CachedDestination);
 		}
 
 		FollowTime = 0.f;

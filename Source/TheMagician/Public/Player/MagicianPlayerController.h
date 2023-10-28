@@ -7,6 +7,7 @@
 #include "GameplayTagContainer.h"
 #include "MagicianPlayerController.generated.h"
 
+class UNiagaraSystem;
 class UDamageTextComponent;
 class UMagicianAbilitySystemComponent;
 class UMagicianInputConfig;
@@ -91,6 +92,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USplineComponent> Spline;
+
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UNiagaraSystem> ClickNiagaraSystem;
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UDamageTextComponent> DamageTextComponentClas;
