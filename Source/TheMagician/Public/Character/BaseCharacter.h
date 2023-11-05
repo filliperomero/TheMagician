@@ -37,6 +37,7 @@ public:
 	virtual int32 GetMinionCount_Implementation() override;
 	virtual void IncrementMinionCount_Implementation(int32 Amount) override;
 	virtual ECharacterClass GetCharacterClass_Implementation() override;
+	virtual USkeletalMeshComponent* GetWeapon_Implementation() override;
 
 	UPROPERTY(EditAnywhere, Category = Combat)
 	TArray<FTaggedMontage> AttackMontages;

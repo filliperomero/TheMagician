@@ -175,6 +175,11 @@ ECharacterClass ABaseCharacter::GetCharacterClass_Implementation()
 	return CharacterClass;
 }
 
+USkeletalMeshComponent* ABaseCharacter::GetWeapon_Implementation()
+{
+	return Weapon;
+}
+
 FOnASCRegistered& ABaseCharacter::GetOnASCRegisteredDelegate()
 {
 	return OnAscRegistered;
