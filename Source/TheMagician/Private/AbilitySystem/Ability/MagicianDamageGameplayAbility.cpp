@@ -47,6 +47,11 @@ FDamageEffectParams UMagicianDamageGameplayAbility::MakeDamageEffectParamsFromCl
 	return DamageEffectParams;
 }
 
+float UMagicianDamageGameplayAbility::GetDamageAtLevel() const
+{
+	return Damage.GetValueAtLevel(GetAbilityLevel());
+}
+
 FTaggedMontage UMagicianDamageGameplayAbility::GetRandomTaggedMontageFromArray(const TArray<FTaggedMontage>& TaggedMontages) const
 {
 	if (TaggedMontages.Num() == 0) return FTaggedMontage();
