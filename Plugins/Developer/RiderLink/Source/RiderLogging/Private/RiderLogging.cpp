@@ -2,15 +2,15 @@
 
 #include "BlueprintProvider.hpp"
 #include "IRiderLink.hpp"
-#include "Model/Library/UE4Library/LogMessageInfo.Generated.h"
-#include "Model/Library/UE4Library/StringRange.Generated.h"
-#include "Model/Library/UE4Library/UnrealLogEvent.Generated.h"
+#include "Model/Library/UE4Library/LogMessageInfo.Pregenerated.h"
+#include "Model/Library/UE4Library/StringRange.Pregenerated.h"
+#include "Model/Library/UE4Library/UnrealLogEvent.Pregenerated.h"
 
 #include "Internationalization/Regex.h"
 #include "Misc/DateTime.h"
 #include "Modules/ModuleManager.h"
 
-#define LOCTEXT_NAMESPACE "RiderLink"
+#define LOCTEXT_NAMESPACE "RiderLogging"
 
 DEFINE_LOG_CATEGORY(FLogRiderLoggingModule);
 
@@ -138,3 +138,5 @@ void FRiderLoggingModule::ShutdownModule()
 	ModuleLifetimeDef.terminate();
 	UE_LOG(FLogRiderLoggingModule, Verbose, TEXT("SHUTDOWN FINISH"));
 }
+
+#undef LOCTEXT_NAMESPACE

@@ -1,7 +1,7 @@
 ﻿#include "RiderLC.hpp"
 
 #include "IRiderLink.hpp"
-#include "RdEditorModel/RdEditorModel.Generated.h"
+#include "RdEditorModel/RdEditorModel.Pregenerated.h"
 
 #include "Async/Async.h"
 #if WITH_LIVE_CODING
@@ -12,6 +12,8 @@
 #define LOCTEXT_NAMESPACE "FRiderLCModule"
 
 DEFINE_LOG_CATEGORY(FLogRiderLCModule);
+
+IMPLEMENT_MODULE(FRiderLCModule, RiderLC)
 
 const FName HotReloadModule("HotReload");
 
@@ -115,5 +117,3 @@ void FRiderLCModule::ShutdownModule()
 }
 
 #undef LOCTEXT_NAMESPACE
-    
-IMPLEMENT_MODULE(FRiderLCModule, RiderLC)

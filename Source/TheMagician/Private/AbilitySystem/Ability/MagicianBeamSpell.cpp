@@ -78,8 +78,8 @@ void UMagicianBeamSpell::StoreAdditionalTargets(TArray<AActor*>& OutAdditionalTa
 		MouseHitActor->GetActorLocation()
 	);
 
-	const int32 NumAdditionalTargets = FMath::Min(GetAbilityLevel() - 1, MaxNumShockTargets);
-	// int32 NumAdditionalTargets = 5;
+	//const int32 NumAdditionalTargets = FMath::Min(GetAbilityLevel() - 1, MaxNumShockTargets);
+	 int32 NumAdditionalTargets = 5;
 	
 	UMagicianAbilitySystemLibrary::GetClosestTargets(NumAdditionalTargets, OverlappingActors, OutAdditionalTargets, MouseHitActor->GetActorLocation());
 }
