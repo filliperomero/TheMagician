@@ -2,7 +2,6 @@
 
 
 #include "Character/Enemy.h"
-
 #include "AbilitySystem/MagicianAbilitySystemComponent.h"
 #include "AbilitySystem/MagicianAbilitySystemLibrary.h"
 #include "AbilitySystem/MagicianAttributeSet.h"
@@ -142,6 +141,8 @@ void AEnemy::InitAbilityActorInfo()
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	Cast<UMagicianAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();
 
+	AbilitySystemComponent->RegisterGameplayTagEvent(FMagicianGameplayTags::Get().Debuff_Stun, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &AEnemy::StunTagChanged);
+
 	if (HasAuthority())	InitializeDefaultAttributes();
 
 	OnAscRegistered.Broadcast(AbilitySystemComponent);
@@ -150,4 +151,12 @@ void AEnemy::InitAbilityActorInfo()
 void AEnemy::InitializeDefaultAttributes() const
 {
 	UMagicianAbilitySystemLibrary::InitializeDefaultAttributes(this, CharacterClass, Level, AbilitySystemComponent);
+}
+
+void AEnemy::StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
+{
+	Super::StunTagChanged(CallbackTag, NewCount);
+	
+	if (MagicianAIController && MagicianAIController->GetBlackboardComponent())
+		MagicianAIController->GetBlackboardComponent()->SetValueAsBool(FName("Stunned"), bIsStunned);
 }

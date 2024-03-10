@@ -4,9 +4,11 @@
 #include "Character/MainCharacter.h"
 
 #include "AbilitySystemComponent.h"
+#include "MagicianGameplayTags.h"
 #include "NiagaraComponent.h"
 #include "AbilitySystem/MagicianAbilitySystemComponent.h"
 #include "AbilitySystem/Data/LevelUpInfo.h"
+#include "AbilitySystem/Debuff/DebuffNiagaraComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -47,6 +49,47 @@ AMainCharacter::AMainCharacter()
 	LevelUpNiagaraComponent->bAutoActivate = false;
 }
 
+void AMainCharacter::OnRep_Stunned()
+{
+	Super::OnRep_Stunned();
+
+	if (UMagicianAbilitySystemComponent* MagicianASC = Cast<UMagicianAbilitySystemComponent>(AbilitySystemComponent))
+	{
+		const FMagicianGameplayTags GameplayTags = FMagicianGameplayTags::Get();
+		
+		FGameplayTagContainer BlockedTags;
+		BlockedTags.AddTag(GameplayTags.Player_Block_CursorTrace);
+		BlockedTags.AddTag(GameplayTags.Player_Block_InputHeld);
+		BlockedTags.AddTag(GameplayTags.Player_Block_InputPressed);
+		BlockedTags.AddTag(GameplayTags.Player_Block_InputReleased);
+
+		if (bIsStunned)
+		{
+			MagicianASC->AddLooseGameplayTags(BlockedTags);
+			StunDebuffComponent->Activate();
+		}
+		else
+		{
+			MagicianASC->RemoveLooseGameplayTags(BlockedTags);
+			StunDebuffComponent->Deactivate();
+		}
+	}
+}
+
+void AMainCharacter::OnRep_Burned()
+{
+	Super::OnRep_Burned();
+
+	if (bIsBurned)
+	{
+		BurnDebuffComponent->Activate();
+	}
+	else
+	{
+		BurnDebuffComponent->Deactivate();
+	}
+}
+
 void AMainCharacter::InitAbilityActorInfo()
 {
 	AMagicianPlayerState* MagicianPlayerState = GetPlayerState<AMagicianPlayerState>();
@@ -58,6 +101,9 @@ void AMainCharacter::InitAbilityActorInfo()
 	AbilitySystemComponent = MagicianPlayerState->GetAbilitySystemComponent();
 	AttributeSet = MagicianPlayerState->GetAttributeSet();
 	OnAscRegistered.Broadcast(AbilitySystemComponent);
+	
+	AbilitySystemComponent->RegisterGameplayTagEvent(FMagicianGameplayTags::Get().Debuff_Stun, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &AMainCharacter::StunTagChanged);
+	AbilitySystemComponent->RegisterGameplayTagEvent(FMagicianGameplayTags::Get().Debuff_Burn, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &AMainCharacter::BurnTagChanged);
 
 	// In multiplayer, the PlayerController will be invalid in other people computers, since I can only get my PlayerController but not others
 	if (AMagicianPlayerController* MagicianPlayerController = Cast<AMagicianPlayerController>(GetController()))

@@ -165,10 +165,13 @@ void UMagicianAttributeSet::HandleIncomingDamage(const FEffectProperties& Props)
 		}
 		else
 		{
-			FGameplayTagContainer TagContainer;
-			TagContainer.AddTag(FMagicianGameplayTags::Get().Effects_HitReact);
-				
-			Props.TargetASC->TryActivateAbilitiesByTag(TagContainer);
+			// We should not HitReact while the target is being shocked
+			if (Props.TargetCharacter->Implements<UCombatInterface>() && !ICombatInterface::Execute_IsBeingShocked(Props.TargetCharacter))
+			{
+				FGameplayTagContainer TagContainer;
+				TagContainer.AddTag(FMagicianGameplayTags::Get().Effects_HitReact);
+				Props.TargetASC->TryActivateAbilitiesByTag(TagContainer);
+			}
 
 			const FVector& KnockbackForce = UMagicianAbilitySystemLibrary::GetKnockbackForce(Props.EffectContextHandle);
 			if (!KnockbackForce.IsNearlyZero(1.f))
@@ -195,6 +198,7 @@ void UMagicianAttributeSet::HandleDebuff(const FEffectProperties& Props)
 	EffectContext.AddSourceObject(Props.SourceAvatarActor);
 
 	const FGameplayTag DamageType = UMagicianAbilitySystemLibrary::GetDamageType(Props.EffectContextHandle);
+	const FGameplayTag DebuffTag = GameplayTags.DamageTypesToDebuffs[DamageType];
 	const float DebuffDamage = UMagicianAbilitySystemLibrary::GetDebuffDamage(Props.EffectContextHandle);
 	const float DebuffDuration = UMagicianAbilitySystemLibrary::GetDebuffDuration(Props.EffectContextHandle);
 	const float DebuffFrequency = UMagicianAbilitySystemLibrary::GetDebuffFrequency(Props.EffectContextHandle);
@@ -206,9 +210,17 @@ void UMagicianAttributeSet::HandleDebuff(const FEffectProperties& Props)
 	Effect->DurationPolicy = EGameplayEffectDurationType::HasDuration;
 	Effect->Period = DebuffFrequency;
 	Effect->DurationMagnitude = FScalableFloat(DebuffDuration);
-	Effect->InheritableOwnedTagsContainer.AddTag(GameplayTags.DamageTypesToDebuffs[DamageType]);
+	Effect->InheritableOwnedTagsContainer.AddTag(DebuffTag);
 	Effect->StackingType = EGameplayEffectStackingType::AggregateBySource;
 	Effect->StackLimitCount = 1;
+
+	if (DebuffTag.MatchesTagExact(GameplayTags.Debuff_Stun))
+	{
+		Effect->InheritableOwnedTagsContainer.AddTag(GameplayTags.Player_Block_InputHeld);
+		Effect->InheritableOwnedTagsContainer.AddTag(GameplayTags.Player_Block_InputPressed);
+		Effect->InheritableOwnedTagsContainer.AddTag(GameplayTags.Player_Block_InputReleased);
+		Effect->InheritableOwnedTagsContainer.AddTag(GameplayTags.Player_Block_CursorTrace);
+	}
 
 	FGameplayModifierInfo ModInfo = FGameplayModifierInfo();
 	ModInfo.ModifierMagnitude = FScalableFloat(DebuffDamage);
