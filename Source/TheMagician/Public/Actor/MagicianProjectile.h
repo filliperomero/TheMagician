@@ -45,10 +45,10 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USphereComponent> Sphere;
 
-	UPROPERTY(EditAnywhere, Category = VFX)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = VFX, meta=(AllowPrivateAccess = true))
 	TObjectPtr<UNiagaraSystem> ImpactEffect;
 
-	UPROPERTY(EditAnywhere, Category = SFX)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SFX, meta=(AllowPrivateAccess = true))
 	TObjectPtr<USoundBase> ImpactSound;
 
 	UPROPERTY()
