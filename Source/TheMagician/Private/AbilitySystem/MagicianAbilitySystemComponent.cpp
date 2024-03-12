@@ -49,6 +49,7 @@ void UMagicianAbilitySystemComponent::AbilityInputTagHeld(const FGameplayTag& In
 {
 	if (!InputTag.IsValid()) return;
 
+	FScopedAbilityListLock ActiveScopeLock(*this);
 	for (FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
 	{
 		// We're just going to activate the ones that has the InputTag
@@ -69,6 +70,7 @@ void UMagicianAbilitySystemComponent::AbilityInputTagReleased(const FGameplayTag
 {
 	if (!InputTag.IsValid()) return;
 
+	FScopedAbilityListLock ActiveScopeLock(*this);
 	for (FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
 	{
 		if (AbilitySpec.DynamicAbilityTags.HasTagExact(InputTag) && AbilitySpec.IsActive())
@@ -84,6 +86,7 @@ void UMagicianAbilitySystemComponent::AbilityInputTagPressed(const FGameplayTag&
 {
 	if (!InputTag.IsValid()) return;
 
+	FScopedAbilityListLock ActiveScopeLock(*this);
 	for (FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
 	{
 		// We're just going to activate the ones that has the InputTag
@@ -219,22 +222,46 @@ void UMagicianAbilitySystemComponent::ServerEquipAbility_Implementation(const FG
 		
 		if (StatusTag.MatchesTagExact(GameplayTags.Abilities_Status_Equipped) || StatusTag.MatchesTagExact(GameplayTags.Abilities_Status_Unlocked))
 		{
-			// Remove this InputTag (SlotTag) from any Ability that has it
-			ClearAbilitiesOfSlot(SlotTag);
-			// Clear this ability Slot, just in case is a different slot
-			ClearSlot(AbilitySpec);
-			// Assign this ability to this slot
-			AbilitySpec->DynamicAbilityTags.AddTag(SlotTag);
-
-			if (StatusTag.MatchesTagExact(GameplayTags.Abilities_Status_Unlocked))
+			// There is an Ability in this slot already. Deactivate and clear its slot.
+			if (!SlotIsEmpty(SlotTag))
 			{
-				AbilitySpec->DynamicAbilityTags.RemoveTag(GameplayTags.Abilities_Status_Unlocked);
+				if (FGameplayAbilitySpec* SpecWithSlot = GetAbilitySpecWithSlot(SlotTag))
+				{
+					// This indicates we're trying to activate the same ability to the slot
+					if (AbilityTag.MatchesTagExact(GetAbilityTagFromSpec(*SpecWithSlot)))
+					{
+						ClientEquipAbility(AbilityTag, GameplayTags.Abilities_Status_Equipped, SlotTag, PrevSlot);
+						return;
+					}
+
+					if (IsPassiveAbility(*SpecWithSlot))
+					{
+						MulticastActivatePassiveEffect(GetAbilityTagFromSpec(*SpecWithSlot), false);
+						DeactivatePassiveAbilityDelegate.Broadcast(GetAbilityTagFromSpec(*SpecWithSlot));
+					}
+
+					// Clear this ability Slot, just in case is a different slot
+					ClearSlot(SpecWithSlot);
+				}
+			}
+
+			// Ability doesn't yet have a slot (It's not active)
+			if (!AbilityHasAnySlot(*AbilitySpec))
+			{
+				if (IsPassiveAbility(*AbilitySpec))
+				{
+					TryActivateAbility(AbilitySpec->Handle);
+					MulticastActivatePassiveEffect(AbilityTag, true);
+				}
+				AbilitySpec->DynamicAbilityTags.RemoveTag(GetStatusFromSpec(*AbilitySpec));
 				AbilitySpec->DynamicAbilityTags.AddTag(GameplayTags.Abilities_Status_Equipped);
 			}
-			MarkAbilitySpecDirty(*AbilitySpec);
 
-			ClientEquipAbility(AbilityTag, GameplayTags.Abilities_Status_Equipped, SlotTag, PrevSlot);
+			AssignSlotToAbility(*AbilitySpec, SlotTag);
+			MarkAbilitySpecDirty(*AbilitySpec);
 		}
+
+		ClientEquipAbility(AbilityTag, GameplayTags.Abilities_Status_Equipped, SlotTag, PrevSlot);
 	}
 }
 
@@ -357,6 +384,60 @@ FGameplayTag UMagicianAbilitySystemComponent::GetStatusFromSpec(const FGameplayA
 	return FGameplayTag();
 }
 
+bool UMagicianAbilitySystemComponent::SlotIsEmpty(const FGameplayTag& Slot)
+{
+	FScopedAbilityListLock ActiveScopeLoc(*this);
+
+	for (FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
+	{
+		if (AbilityHasSlot(AbilitySpec, Slot)) return false;
+	}
+
+	return true;
+}
+
+bool UMagicianAbilitySystemComponent::AbilityHasSlot(const FGameplayAbilitySpec& AbilitySpec, const FGameplayTag& Slot)
+{
+	return AbilitySpec.DynamicAbilityTags.HasTagExact(Slot);
+}
+
+bool UMagicianAbilitySystemComponent::AbilityHasAnySlot(const FGameplayAbilitySpec& AbilitySpec)
+{
+	return AbilitySpec.DynamicAbilityTags.HasTag(FGameplayTag::RequestGameplayTag(FName("InputTag")));
+}
+
+bool UMagicianAbilitySystemComponent::IsPassiveAbility(const FGameplayAbilitySpec& AbilitySpec) const
+{
+	const UAbilityInfo* AbilityInfo = UMagicianAbilitySystemLibrary::GetAbilityInfo(GetAvatarActor());
+	const FGameplayTag AbilityTag = GetAbilityTagFromSpec(AbilitySpec);
+	const FMagicianAbilityInfo& Info = AbilityInfo->FindAbilityInfoByTag(AbilityTag);
+	const FGameplayTag AbilityType = Info.AbilityTypeTag;
+	
+	return AbilityType.MatchesTagExact(FMagicianGameplayTags::Get().Abilities_Type_Passive);
+}
+
+FGameplayAbilitySpec* UMagicianAbilitySystemComponent::GetAbilitySpecWithSlot(const FGameplayTag& Slot)
+{
+	FScopedAbilityListLock ActiveScopeLoc(*this);
+	
+	for (FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
+	{
+		if (AbilitySpec.DynamicAbilityTags.HasTagExact(Slot))
+		{
+			return &AbilitySpec;
+		}
+	}
+
+	return nullptr;
+}
+
+void UMagicianAbilitySystemComponent::AssignSlotToAbility(FGameplayAbilitySpec& AbilitySpec, const FGameplayTag& Slot)
+{
+	ClearSlot(&AbilitySpec);
+
+	AbilitySpec.DynamicAbilityTags.AddTag(Slot);
+}
+
 void UMagicianAbilitySystemComponent::ClientUpdateAbilityStatus_Implementation(const FGameplayTag& AbilityTag, const FGameplayTag& StatusTag, int32 AbilityLevel)
 {
 	AbilityStatusDelegate.Broadcast(AbilityTag, StatusTag, AbilityLevel);
@@ -365,6 +446,11 @@ void UMagicianAbilitySystemComponent::ClientUpdateAbilityStatus_Implementation(c
 void UMagicianAbilitySystemComponent::ClientEquipAbility_Implementation(const FGameplayTag& AbilityTag, const FGameplayTag& StatusTag, const FGameplayTag& SlotTag, const FGameplayTag& PrevSlotTag)
 {
 	AbilityEquippedDelegate.Broadcast(AbilityTag, StatusTag, SlotTag, PrevSlotTag);
+}
+
+void UMagicianAbilitySystemComponent::MulticastActivatePassiveEffect_Implementation(const FGameplayTag& AbilityTag, const bool bActivate)
+{
+	ActivatePassiveEffectDelegate.Broadcast(AbilityTag, bActivate);
 }
 
 void UMagicianAbilitySystemComponent::OnRep_ActivateAbilities()

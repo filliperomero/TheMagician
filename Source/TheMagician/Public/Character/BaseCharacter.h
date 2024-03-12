@@ -8,6 +8,7 @@
 #include "Interaction/CombatInterface.h"
 #include "BaseCharacter.generated.h"
 
+class UPassiveNiagaraComponent;
 class UDebuffNiagaraComponent;
 class UNiagaraSystem;
 class UGameplayAbility;
@@ -23,6 +24,7 @@ class THEMAGICIAN_API ABaseCharacter : public ACharacter, public IAbilitySystemI
 
 public:
 	ABaseCharacter();
+	virtual void Tick(float DeltaSeconds) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
@@ -158,6 +160,18 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TObjectPtr<UAnimMontage> HitReactMontage;
+
+	UPROPERTY(VisibleAnywhere, Category = "Passive Abilities")
+	TObjectPtr<UPassiveNiagaraComponent> HaloOfProtectionNiagaraComponent;
+
+	UPROPERTY(VisibleAnywhere, Category = "Passive Abilities")
+	TObjectPtr<UPassiveNiagaraComponent> LifeSiphonNiagaraComponent;
+
+	UPROPERTY(VisibleAnywhere, Category = "Passive Abilities")
+	TObjectPtr<UPassiveNiagaraComponent> ManaSiphonNiagaraComponent;
+
+	UPROPERTY(VisibleAnywhere, Category = "Passive Abilities")
+	TObjectPtr<USceneComponent> EffectAttachComponent;
 
 public:
 	FORCEINLINE UAttributeSet* GetAttributeSet() const { return AttributeSet; }
