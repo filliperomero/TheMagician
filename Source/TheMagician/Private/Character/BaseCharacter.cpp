@@ -63,6 +63,14 @@ void ABaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	DOREPLIFETIME(ABaseCharacter, bIsBeingShocked);
 }
 
+float ABaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	const float DamageTaken = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	OnDamageDelegate.Broadcast(DamageTaken);
+
+	return DamageTaken;
+}
+
 void ABaseCharacter::StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
 {
 	bIsStunned = NewCount > 0;
@@ -253,6 +261,11 @@ FOnASCRegistered& ABaseCharacter::GetOnASCRegisteredDelegate()
 FOnDeathSignature& ABaseCharacter::GetOnDeathDelegate()
 {
 	return OnDeathDelegate;
+}
+
+FOnDamageSignature& ABaseCharacter::GetOnDamageSignature()
+{
+	return OnDamageDelegate;
 }
 
 void ABaseCharacter::Dissolve()

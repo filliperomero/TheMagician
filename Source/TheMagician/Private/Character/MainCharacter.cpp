@@ -238,6 +238,24 @@ int32 AMainCharacter::GetSpellPoints_Implementation() const
 	return MagicianPlayerState->GetSpellPoints();
 }
 
+void AMainCharacter::ShowMagicCircle_Implementation(UMaterialInterface* DecalMaterial)
+{
+	if (AMagicianPlayerController* MagicianPlayerController = Cast<AMagicianPlayerController>(GetController()))
+	{
+		MagicianPlayerController->ShowMagicCircle(DecalMaterial);
+		MagicianPlayerController->bShowMouseCursor = false;
+	}
+}
+
+void AMainCharacter::HideMagicCircle_Implementation()
+{
+	if (AMagicianPlayerController* MagicianPlayerController = Cast<AMagicianPlayerController>(GetController()))
+	{
+		MagicianPlayerController->HideMagicCircle();
+		MagicianPlayerController->bShowMouseCursor = true;
+	}
+}
+
 int32 AMainCharacter::GetPlayerLevel_Implementation()
 {
 	const AMagicianPlayerState* MagicianPlayerState = GetPlayerState<AMagicianPlayerState>();

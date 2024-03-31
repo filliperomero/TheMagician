@@ -2,7 +2,6 @@
 
 
 #include "Player/MagicianPlayerController.h"
-
 #include "AbilitySystemBlueprintLibrary.h"
 #include "EnhancedInputSubsystems.h"
 #include "MagicianGameplayTags.h"
@@ -10,11 +9,14 @@
 #include "NavigationSystem.h"
 #include "NiagaraFunctionLibrary.h"
 #include "AbilitySystem/MagicianAbilitySystemComponent.h"
+#include "Actor/MagicCircle.h"
 #include "Character/MainCharacter.h"
+#include "Components/DecalComponent.h"
 #include "Components/SplineComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Input/MagicianInputComponent.h"
 #include "Interaction/EnemyInterface.h"
+#include "TheMagician/TheMagician.h"
 #include "UI/Widget/DamageTextComponent.h"
 
 AMagicianPlayerController::AMagicianPlayerController()
@@ -30,6 +32,24 @@ void AMagicianPlayerController::PlayerTick(float DeltaTime)
 
 	CursorTrace();
 	if (bAutoRunning) AutoRun();
+	UpdateMagicCircleLocation();
+}
+
+void AMagicianPlayerController::ShowMagicCircle(UMaterialInterface* DecalMaterial)
+{
+	if (IsValid(MagicCircle)) return;
+	
+	MagicCircle = GetWorld()->SpawnActor<AMagicCircle>(MagicCircleClass);
+
+	if (IsValid(DecalMaterial))
+	{
+		MagicCircle->MagicCircleDecal->SetMaterial(0, DecalMaterial);
+	}
+}
+
+void AMagicianPlayerController::HideMagicCircle()
+{
+	if (IsValid(MagicCircle)) MagicCircle->Destroy();
 }
 
 void AMagicianPlayerController::ShowDamageNumber_Implementation(float DamageAmount, ACharacter* TargetCharacter, bool bBlockedHit, bool bCriticalHit)
@@ -61,6 +81,13 @@ void AMagicianPlayerController::AutoRun()
 			bAutoRunning = false;
 		}
 	}
+}
+
+void AMagicianPlayerController::UpdateMagicCircleLocation()
+{
+	if (!IsValid(MagicCircle)) return;
+
+	MagicCircle->SetActorLocation(CursorHit.ImpactPoint);
 }
 
 void AMagicianPlayerController::BeginPlay()
@@ -155,8 +182,9 @@ void AMagicianPlayerController::CursorTrace()
 		CurrentHoveredActor = nullptr;
 		return;
 	}
-	
-	GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);
+
+	const ECollisionChannel TraceChannel = IsValid(MagicCircle) ? ECC_ExcludePlayers : ECC_Visibility;
+	GetHitResultUnderCursor(TraceChannel, false, CursorHit);
 
 	// Didn't hit anything
 	if (!CursorHit.bBlockingHit) return;
