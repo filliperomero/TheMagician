@@ -1,9 +1,11 @@
 ﻿// Copyright Fillipe Romero
 
 #include "Actor/MagicianFireBall.h"
-
 #include "AbilitySystemBlueprintLibrary.h"
+#include "GameplayCueManager.h"
+#include "MagicianGameplayTags.h"
 #include "AbilitySystem/MagicianAbilitySystemLibrary.h"
+#include "Components/AudioComponent.h"
 
 void AMagicianFireBall::BeginPlay()
 {
@@ -26,4 +28,23 @@ void AMagicianFireBall::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent
 			UMagicianAbilitySystemLibrary::ApplyDamageEffect(DamageEffectParams);
 		}
 	}
+}
+
+void AMagicianFireBall::OnHit()
+{
+	if (IsValid(GetOwner()))
+	{
+		FGameplayCueParameters CueParams;
+		CueParams.Location = GetActorLocation();
+		
+		UGameplayCueManager::ExecuteGameplayCue_NonReplicated(GetOwner(), FMagicianGameplayTags::Get().GameplayCue_FireBlast, CueParams);
+	}
+	
+	if (LoopingSoundComponent)
+	{
+		LoopingSoundComponent->Stop();
+		LoopingSoundComponent->DestroyComponent();
+	}
+	
+	bHit = true;
 }
