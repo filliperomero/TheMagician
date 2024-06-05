@@ -38,7 +38,7 @@ This game was developed following SOLID coding principles and balance Blueprint/
 <!-- LICENSE -->
 ## License
 
-Copyright © 2023, [Fillipe Romero](https://filliperomero.com). All rights reserved.
+Copyright © 2024, [Fillipe Romero](https://filliperomero.com). All rights reserved.
 
 Assets rights are reserved to [Druid Mechanics](https://github.com/DruidMech)
 
