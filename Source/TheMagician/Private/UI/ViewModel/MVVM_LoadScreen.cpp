@@ -1,6 +1,8 @@
 ﻿// Copyright Fillipe Romero
 
 #include "UI/ViewModel/MVVM_LoadScreen.h"
+
+#include "Game/MagicianGameInstance.h"
 #include "Game/MagicianGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "UI/ViewModel/MVVM_LoadSlot.h"
@@ -38,6 +40,11 @@ void UMVVM_LoadScreen::NewSlotButtonPressed(int32 SlotIndex, const FString& Ente
 
 	MagicianGameMode->SaveSlotData(LoadSlots[SlotIndex], SlotIndex);
 	LoadSlots[SlotIndex]->InitializeSlot();
+
+	UMagicianGameInstance* MagicianGameInstance = Cast<UMagicianGameInstance>(MagicianGameMode->GetGameInstance());
+	MagicianGameInstance->LoadSlotName = LoadSlots[SlotIndex]->LoadSlotName;
+	MagicianGameInstance->LoadSlotIndex = LoadSlots[SlotIndex]->SlotIndex;
+	MagicianGameInstance->PlayerStartTag = MagicianGameMode->DefaultPlayerStartTag;
 }
 
 void UMVVM_LoadScreen::NewGameButtonPressed(int32 SlotIndex)
