@@ -37,6 +37,7 @@ void UMVVM_LoadScreen::NewSlotButtonPressed(int32 SlotIndex, const FString& Ente
 	LoadSlots[SlotIndex]->SetMapName(MagicianGameMode->DefaultMapName);
 	LoadSlots[SlotIndex]->SetPlayerName(EnteredName);
 	LoadSlots[SlotIndex]->SlotStatus = Taken;
+	LoadSlots[SlotIndex]->PlayerStartTag = MagicianGameMode->DefaultPlayerStartTag;
 
 	MagicianGameMode->SaveSlotData(LoadSlots[SlotIndex], SlotIndex);
 	LoadSlots[SlotIndex]->InitializeSlot();
@@ -82,8 +83,10 @@ void UMVVM_LoadScreen::DeleteButtonPressed()
 void UMVVM_LoadScreen::PlayButtonPressed()
 {
 	if (!IsValid(SelectedSlot)) return;
-	
 	AMagicianGameModeBase* MagicianGameMode = Cast<AMagicianGameModeBase>(UGameplayStatics::GetGameMode(this));
+	UMagicianGameInstance* MagicianGameInstance = MagicianGameMode->GetGameInstance<UMagicianGameInstance>();
+	
+	MagicianGameInstance->PlayerStartTag = SelectedSlot->PlayerStartTag;
 
 	MagicianGameMode->TravelToMap(SelectedSlot);
 }
@@ -99,6 +102,7 @@ void UMVVM_LoadScreen::LoadData()
 		LoadSlot.Value->SlotStatus = SaveObject->SaveSlotStatus;
 		LoadSlot.Value->SetPlayerName(SaveObject->PlayerName);
 		LoadSlot.Value->SetMapName(SaveObject->MapName);
+		LoadSlot.Value->PlayerStartTag = SaveObject->PlayerStartTag;
 		
 		LoadSlot.Value->InitializeSlot();
 	}
