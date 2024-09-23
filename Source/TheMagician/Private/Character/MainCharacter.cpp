@@ -10,8 +10,11 @@
 #include "AbilitySystem/Data/LevelUpInfo.h"
 #include "AbilitySystem/Debuff/DebuffNiagaraComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Game/LoadScreenSaveGame.h"
+#include "Game/MagicianGameModeBase.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Player/MagicianPlayerController.h"
 #include "Player/MagicianPlayerState.h"
 #include "UI/HUD/MagicianHUD.h"
@@ -253,6 +256,22 @@ void AMainCharacter::HideMagicCircle_Implementation()
 	{
 		MagicianPlayerController->HideMagicCircle();
 		MagicianPlayerController->bShowMouseCursor = true;
+	}
+}
+
+void AMainCharacter::SaveProgress_Implementation(const FName& CheckpointTag)
+{
+	AMagicianGameModeBase* MagicianGameMode = Cast<AMagicianGameModeBase>(UGameplayStatics::GetGameMode(this));
+
+	if (MagicianGameMode)
+	{
+		ULoadScreenSaveGame* SaveData = MagicianGameMode->RetrieveInGameSaveData();
+
+		if (SaveData == nullptr) return;
+
+		SaveData->PlayerStartTag = CheckpointTag;
+		
+		MagicianGameMode->SaveInGameProgressData(SaveData);
 	}
 }
 

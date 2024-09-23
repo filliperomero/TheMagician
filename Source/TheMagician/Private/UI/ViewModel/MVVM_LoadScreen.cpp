@@ -87,6 +87,8 @@ void UMVVM_LoadScreen::PlayButtonPressed()
 	UMagicianGameInstance* MagicianGameInstance = MagicianGameMode->GetGameInstance<UMagicianGameInstance>();
 	
 	MagicianGameInstance->PlayerStartTag = SelectedSlot->PlayerStartTag;
+	MagicianGameInstance->LoadSlotName = SelectedSlot->LoadSlotName;
+	MagicianGameInstance->LoadSlotIndex = SelectedSlot->SlotIndex;
 
 	MagicianGameMode->TravelToMap(SelectedSlot);
 }

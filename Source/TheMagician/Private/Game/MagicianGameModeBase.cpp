@@ -35,6 +35,28 @@ bool AMagicianGameModeBase::DeleteSlot(const FString& SlotName, int32 SlotIndex)
 	return false;
 }
 
+ULoadScreenSaveGame* AMagicianGameModeBase::RetrieveInGameSaveData()
+{
+	const UMagicianGameInstance* MagicianGameInstance = GetGameInstance<UMagicianGameInstance>();
+
+	const FString InGameLoadSlotName = MagicianGameInstance->LoadSlotName;
+	const int32 InGameLoadSlotIndex = MagicianGameInstance->LoadSlotIndex;
+
+	return GetSaveSlotData(InGameLoadSlotName, InGameLoadSlotIndex);
+}
+
+bool AMagicianGameModeBase::SaveInGameProgressData(ULoadScreenSaveGame* SaveObject)
+{
+	UMagicianGameInstance* MagicianGameInstance = GetGameInstance<UMagicianGameInstance>();
+	
+	const FString InGameLoadSlotName = MagicianGameInstance->LoadSlotName;
+	const int32 InGameLoadSlotIndex = MagicianGameInstance->LoadSlotIndex;
+	
+	MagicianGameInstance->PlayerStartTag = SaveObject->PlayerStartTag;
+
+	return UGameplayStatics::SaveGameToSlot(SaveObject, InGameLoadSlotName, InGameLoadSlotIndex);
+}
+
 ULoadScreenSaveGame* AMagicianGameModeBase::GetSaveSlotData(const FString& SlotName, int32 SlotIndex) const
 {
 	USaveGame* SaveGameObject = nullptr;
