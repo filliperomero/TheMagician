@@ -7,6 +7,7 @@
 #include "MagicianGameplayTags.h"
 #include "NiagaraComponent.h"
 #include "AbilitySystem/MagicianAbilitySystemComponent.h"
+#include "AbilitySystem/MagicianAttributeSet.h"
 #include "AbilitySystem/Data/LevelUpInfo.h"
 #include "AbilitySystem/Debuff/DebuffNiagaraComponent.h"
 #include "Camera/CameraComponent.h"
@@ -270,6 +271,19 @@ void AMainCharacter::SaveProgress_Implementation(const FName& CheckpointTag)
 		if (SaveData == nullptr) return;
 
 		SaveData->PlayerStartTag = CheckpointTag;
+
+		if (const AMagicianPlayerState* MagicianPlayerState = GetPlayerState<AMagicianPlayerState>())
+		{
+			SaveData->PlayerLevel = MagicianPlayerState->GetPlayerLevel();
+			SaveData->XP = MagicianPlayerState->GetXP();
+			SaveData->AttributePoints = MagicianPlayerState->GetAttributePoints();
+			SaveData->SpellPoints = MagicianPlayerState->GetSpellPoints();
+		}
+
+		SaveData->Strength = UMagicianAttributeSet::GetStrengthAttribute().GetNumericValue(GetAttributeSet());
+		SaveData->Intelligence = UMagicianAttributeSet::GetIntelligenceAttribute().GetNumericValue(GetAttributeSet());
+		SaveData->Resilience = UMagicianAttributeSet::GetResilienceAttribute().GetNumericValue(GetAttributeSet());
+		SaveData->Vitality = UMagicianAttributeSet::GetVitalityAttribute().GetNumericValue(GetAttributeSet());
 		
 		MagicianGameMode->SaveInGameProgressData(SaveData);
 	}
