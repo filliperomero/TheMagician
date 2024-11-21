@@ -64,6 +64,18 @@ void AMagicianPlayerState::AddAttributePoints(int32 InPoints)
 	OnAttributePointsChangedDelegate.Broadcast(AttributePoints);
 }
 
+void AMagicianPlayerState::SetAttributePoints(int32 InPoints)
+{
+	AttributePoints = InPoints;
+	OnAttributePointsChangedDelegate.Broadcast(AttributePoints);
+}
+
+void AMagicianPlayerState::SetSpellPoints(int32 InPoints)
+{
+	SpellPoints = InPoints;
+	OnSpellPointsChangedDelegate.Broadcast(SpellPoints);
+}
+
 void AMagicianPlayerState::AddSpellPoints(int32 InPoints)
 {
 	SpellPoints += InPoints;

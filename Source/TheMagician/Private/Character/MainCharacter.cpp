@@ -119,7 +119,38 @@ void AMainCharacter::InitAbilityActorInfo()
 		}
 	}
 
-	InitializeDefaultAttributes();
+	// Not used anymore since we're loading the attributes from Disk using 'LoadProgress'
+	// InitializeDefaultAttributes();
+}
+
+void AMainCharacter::LoadProgress()
+{
+	AMagicianGameModeBase* MagicianGameMode = Cast<AMagicianGameModeBase>(UGameplayStatics::GetGameMode(this));
+
+	if (MagicianGameMode)
+	{
+		ULoadScreenSaveGame* SaveData = MagicianGameMode->RetrieveInGameSaveData();
+
+		if (SaveData == nullptr) return;
+
+		if (AMagicianPlayerState* MagicianPlayerState = GetPlayerState<AMagicianPlayerState>())
+		{
+			MagicianPlayerState->SetLevel(SaveData->PlayerLevel);
+			MagicianPlayerState->SetXP(SaveData->XP);
+			MagicianPlayerState->SetAttributePoints(SaveData->AttributePoints);
+			MagicianPlayerState->SetSpellPoints(SaveData->SpellPoints);
+		}
+
+		if (SaveData->bFirstTimeLoadIn)
+		{
+			InitializeDefaultAttributes();
+			AddCharacterAbilities();
+		}
+		else
+		{
+			// TODO: Load from disk
+		}
+	}
 }
 
 void AMainCharacter::PossessedBy(AController* NewController)
@@ -129,7 +160,10 @@ void AMainCharacter::PossessedBy(AController* NewController)
 	// Init Ability Actor Info for the Server
 	InitAbilityActorInfo();
 
-	AddCharacterAbilities();
+	LoadProgress();
+
+	// Not used anymore since we're loading the abilities from Disk using 'LoadProgress'
+	// AddCharacterAbilities();
 }
 
 void AMainCharacter::OnRep_PlayerState()
@@ -284,6 +318,8 @@ void AMainCharacter::SaveProgress_Implementation(const FName& CheckpointTag)
 		SaveData->Intelligence = UMagicianAttributeSet::GetIntelligenceAttribute().GetNumericValue(GetAttributeSet());
 		SaveData->Resilience = UMagicianAttributeSet::GetResilienceAttribute().GetNumericValue(GetAttributeSet());
 		SaveData->Vitality = UMagicianAttributeSet::GetVitalityAttribute().GetNumericValue(GetAttributeSet());
+
+		SaveData->bFirstTimeLoadIn = false;
 		
 		MagicianGameMode->SaveInGameProgressData(SaveData);
 	}

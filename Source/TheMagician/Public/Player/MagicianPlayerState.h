@@ -28,7 +28,9 @@ public:
 	void AddToXP(int32 InXP);
 	void SetXP(int32 InXP);
 	void AddAttributePoints(int32 InPoints);
+	void SetAttributePoints(int32 InPoints);
 	void AddSpellPoints(int32 InPoints);
+	void SetSpellPoints(int32 InPoints);
 
 	FOnPlayerStatChanged OnXPChangedDelegate;
 	FOnPlayerStatChanged OnLevelChangedDelegate;
