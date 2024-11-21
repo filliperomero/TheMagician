@@ -7,6 +7,7 @@
 #include "MagicianGameplayTags.h"
 #include "NiagaraComponent.h"
 #include "AbilitySystem/MagicianAbilitySystemComponent.h"
+#include "AbilitySystem/MagicianAbilitySystemLibrary.h"
 #include "AbilitySystem/MagicianAttributeSet.h"
 #include "AbilitySystem/Data/LevelUpInfo.h"
 #include "AbilitySystem/Debuff/DebuffNiagaraComponent.h"
@@ -133,14 +134,6 @@ void AMainCharacter::LoadProgress()
 
 		if (SaveData == nullptr) return;
 
-		if (AMagicianPlayerState* MagicianPlayerState = GetPlayerState<AMagicianPlayerState>())
-		{
-			MagicianPlayerState->SetLevel(SaveData->PlayerLevel);
-			MagicianPlayerState->SetXP(SaveData->XP);
-			MagicianPlayerState->SetAttributePoints(SaveData->AttributePoints);
-			MagicianPlayerState->SetSpellPoints(SaveData->SpellPoints);
-		}
-
 		if (SaveData->bFirstTimeLoadIn)
 		{
 			InitializeDefaultAttributes();
@@ -148,7 +141,17 @@ void AMainCharacter::LoadProgress()
 		}
 		else
 		{
-			// TODO: Load from disk
+			// TODO: Load abilities from disk
+			
+			if (AMagicianPlayerState* MagicianPlayerState = GetPlayerState<AMagicianPlayerState>())
+			{
+				MagicianPlayerState->SetLevel(SaveData->PlayerLevel);
+				MagicianPlayerState->SetXP(SaveData->XP);
+				MagicianPlayerState->SetAttributePoints(SaveData->AttributePoints);
+				MagicianPlayerState->SetSpellPoints(SaveData->SpellPoints);
+			}
+			
+			UMagicianAbilitySystemLibrary::InitializeDefaultAttributesFromSaveData(this, AbilitySystemComponent, SaveData);
 		}
 	}
 }

@@ -27,9 +27,9 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 	/** Bind to PlayerState Delegates */
 	GetMagicianPS()->OnXPChangedDelegate.AddUObject(this, &ThisClass::OnXPChanged);
 	GetMagicianPS()->OnLevelChangedDelegate.AddLambda(
-		[this](int32 NewLevel)
+		[this](int32 NewLevel, bool bLevelUp)
 		{
-			OnPlayerLevelChangedDelegate.Broadcast(NewLevel);
+			OnPlayerLevelChangedDelegate.Broadcast(NewLevel, bLevelUp);
 		}
 	);
 

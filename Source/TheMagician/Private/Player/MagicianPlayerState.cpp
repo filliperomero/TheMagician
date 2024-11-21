@@ -37,13 +37,13 @@ UAbilitySystemComponent* AMagicianPlayerState::GetAbilitySystemComponent() const
 void AMagicianPlayerState::AddToLevel(int32 InLevel)
 {
 	Level += InLevel;
-	OnLevelChangedDelegate.Broadcast(Level);
+	OnLevelChangedDelegate.Broadcast(Level, true);
 }
 
 void AMagicianPlayerState::SetLevel(int32 InLevel)
 {
 	Level = InLevel;
-	OnLevelChangedDelegate.Broadcast(Level);
+	OnLevelChangedDelegate.Broadcast(Level, false);
 }
 
 void AMagicianPlayerState::AddToXP(int32 InXP)
@@ -84,7 +84,7 @@ void AMagicianPlayerState::AddSpellPoints(int32 InPoints)
 
 void AMagicianPlayerState::OnRep_Level(int32 OldLevel)
 {
-	OnLevelChangedDelegate.Broadcast(Level);
+	OnLevelChangedDelegate.Broadcast(Level, true);
 }
 
 void AMagicianPlayerState::OnRep_XP(int32 OldXP)
